@@ -7,7 +7,6 @@ class User
 	//variables
 
 
-
 	//methodes
 public:
 	User();
