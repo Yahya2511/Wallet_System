@@ -3,6 +3,8 @@
 #include "Transaction.h"
 #include <vector>
 #include <stack>
+#include <map>
+
 using namespace std;
 
 enum Status
@@ -23,9 +25,13 @@ class User
 
 	//methodes
 public:
+	User();
 	User(string, string, double);
 
-	bool makeTransaction(vector<User> &users,string userName, double balance);
+	void userRegister();
+	void login();
+
+	bool makeTransaction(map<string, User> &users,string userName, double balance);
 
 	~User();
 
@@ -33,9 +39,9 @@ public:
 	//void setUserName(string s);
 
 	void viewHistory();
-	void addToHistory(vector<User>& users, string userName, double balance, int userPosition);
+	void addToHistory(map<string, User>& users, string userName, double balance);
 
-	stack<Transaction> GetTransaction();
+	stack<Transaction>& GetTransaction();
 
 	string getPassword();
 	void setPassword(string s);

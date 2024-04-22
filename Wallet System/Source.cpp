@@ -3,6 +3,7 @@
 #include "Transaction.h"
 #include <vector>
 #include "ctime"
+#include <map>
 
 using namespace std;
 
@@ -15,37 +16,42 @@ int main()
 	ctime_s(tm, sizeof tm, &curr_time);
 	std::cout << "Today is : " << tm;
 
-	vector<User> users;
+	map<string, User> users;
 
 	User u1 = User("user1", "password1", 500);
 	User u2 = User("user2", "password2", 1000);
 	User u3 = User("user3", "password3", 1500);
 	
-	users.push_back(u1);
-	users.push_back(u2);
-	users.push_back(u3);
+	users[u1.getUserName()] = u1;
+	users[u2.getUserName()] = u2;
+	users[u3.getUserName()] = u3;
 
-	users[0].makeTransaction(users, "user2", 300.0);
-	users[0].makeTransaction(users, "user3", 100.0);
-	users[0].makeTransaction(users, "user2", 50.0);
-
-	users[2].setBalance(1.0);
-
-	for (int i = 0; i < users.size(); i++)
+	map<string, User>::iterator it;
+	it = users.begin();
+	while(it != users.end())
 	{
-		cout << users[i].getUserName() << ": " << users[i].getBalance() << endl;
+		cout<<it->first<<endl;
+		cout<<it->second.getUserName()<<" " << it->second.getPassword() << " " << it->second.getBalance();
+		cout<<endl;
+		it++;
+	}
+	
+	users["user1"].makeTransaction(users, "user2", 300.0);
+	users["user1"].makeTransaction(users, "user2", 100.0);
+	users["user1"].makeTransaction(users, "user2", 350000.0);
+	users["user3"].makeTransaction(users, "user1", 350.0);
 
-		
+	while (it != users.end())
+	{
+		cout << it->first << endl;
+		cout << it->second.getUserName() << " " << it->second.getPassword() << " " << it->second.getBalance();
+		cout << endl;
+		it++;
 	}
 
-	users[0].viewHistory();
-
-	users[1].viewHistory();
-
-
-
-
-
+	users["user1"].viewHistory();
+	users["user2"].viewHistory();
+	users["user3"].viewHistory();
 
 	return 0;
 }

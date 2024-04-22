@@ -2,7 +2,13 @@
 #include <string>
 #include "Transaction.h"
 
-
+User::User()
+{
+	userName = "0";
+	password = "0";
+	balance = 0;
+	status = Status::Active;
+}
 
 User::User(string name, string pass, double bal)
 {
@@ -12,9 +18,10 @@ User::User(string name, string pass, double bal)
 	status = Status::Active;
 }
 
-bool User::makeTransaction(vector<User> &users,string reciever, double amount)
+bool User::makeTransaction(map<string, User> &users,string reciever, double amount)
 {
 	//check suspended accounts
+	
 	if (status == Status::Suspend)
 	{
 		cout << "Can not make transaction!\nReason: Account is suspended\n\n";
@@ -34,16 +41,8 @@ bool User::makeTransaction(vector<User> &users,string reciever, double amount)
 	}
 
 	//find the user that you want to send to
-	int userPostion = -1;
-	for (int userIndex = 0; userIndex < users.size(); userIndex++)
-	{
-		if (reciever == users[userIndex].getUserName())
-		{
-			userPostion = userIndex;
-			break;
-		}
-	}
-	if (userPostion == -1)
+	
+	if (users.find(reciever) == users.end())
 	{
 		cout << "Can not make transaction!\nReason: User not found\n\n";
 		return false;
@@ -57,35 +56,27 @@ bool User::makeTransaction(vector<User> &users,string reciever, double amount)
 	}
 
 	//make transaction
-	users[userPostion].setBalance(users[userPostion].getBalance() + amount);
+	users[reciever].addToBalance(amount);
 	balance -= amount;
 
 	cout << "successfull Transaction!\n\n";
 
-
-	
-
-	addToHistory(users, userName,  balance, userPostion);
-
+	addToHistory(users, reciever,  amount);
 
 	return true;
 }
 
-void User::addToHistory(vector<User>& users, string reciever, double amount, int senderPosition)
+void User::addToHistory(map<string, User>& users, string reciever, double amount)
 {
-	historyOfTransaction.push(Transaction(userName, reciever, amount));
-	users[senderPosition].GetTransaction().push(Transaction(userName,reciever,amount));
+	Transaction t = Transaction(userName, reciever, amount);
+	historyOfTransaction.push(t);
+	users[reciever].GetTransaction().push(t);
 }
 
-stack<Transaction> User::GetTransaction()
+stack<Transaction>& User::GetTransaction()
 {
 	return historyOfTransaction;
 }
-
-
-
-
-
 
 string User::getUserName() 
 {
@@ -130,9 +121,6 @@ User::~User()
 
 }
 
-
-
-
 void User::viewHistory()
 {
 	cout << "HERE IS THE TRANSACTIONS : \n";
@@ -155,5 +143,4 @@ void User::viewHistory()
 		cout << "\n";
 		temproryStack.pop();
 	}
-
 }
