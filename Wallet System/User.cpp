@@ -1,5 +1,8 @@
 #include "User.h"
 #include <string>
+#include "Transaction.h"
+
+
 
 User::User(string name, string pass, double bal)
 {
@@ -9,7 +12,7 @@ User::User(string name, string pass, double bal)
 	status = Status::Active;
 }
 
-bool User::makeTransaction(vector<User> &users,string userName, double amount)
+bool User::makeTransaction(vector<User> &users,string reciever, double amount)
 {
 	//check suspended accounts
 	if (status == Status::Suspend)
@@ -34,7 +37,7 @@ bool User::makeTransaction(vector<User> &users,string userName, double amount)
 	int userPostion = -1;
 	for (int userIndex = 0; userIndex < users.size(); userIndex++)
 	{
-		if (userName == users[userIndex].getUserName())
+		if (reciever == users[userIndex].getUserName())
 		{
 			userPostion = userIndex;
 			break;
@@ -58,8 +61,31 @@ bool User::makeTransaction(vector<User> &users,string userName, double amount)
 	balance -= amount;
 
 	cout << "successfull Transaction!\n\n";
+
+
+	
+
+	addToHistory(users, userName,  balance, userPostion);
+
+
 	return true;
 }
+
+void User::addToHistory(vector<User>& users, string reciever, double amount, int senderPosition)
+{
+	historyOfTransaction.push(Transaction(userName, reciever, amount));
+	users[senderPosition].GetTransaction().push(Transaction(userName,reciever,amount));
+}
+
+stack<Transaction> User::GetTransaction()
+{
+	return historyOfTransaction;
+}
+
+
+
+
+
 
 string User::getUserName() 
 {
@@ -101,5 +127,33 @@ void User::setBalance(double b)
 
 User::~User()
 {
+
+}
+
+
+
+
+void User::viewHistory()
+{
+	cout << "HERE IS THE TRANSACTIONS : \n";
+	if (historyOfTransaction.empty())
+	{
+		cout << "There is No history\n";
+		return;
+	}
+	stack <Transaction>temproryStack;
+	temproryStack = historyOfTransaction;
+	while (!temproryStack.empty())
+	{
+		cout << "The sender is " << temproryStack.top().Get_Sender();
+		cout << "\t";
+		cout << "The amount is " << temproryStack.top().Get_Amount();
+		cout << "\t";
+		cout << "The reciever is " << temproryStack.top().Get_Reciver();
+		cout << "\n";
+		cout << "*********************************************";
+		cout << "\n";
+		temproryStack.pop();
+	}
 
 }

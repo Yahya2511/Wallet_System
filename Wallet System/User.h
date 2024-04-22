@@ -2,6 +2,7 @@
 #include <iostream>
 #include "Transaction.h"
 #include <vector>
+#include <stack>
 using namespace std;
 
 enum Status
@@ -16,6 +17,7 @@ class User
 	string userName;
 	string password;
 	double balance = 0;
+	stack <Transaction> historyOfTransaction;
 	
 	Status status;
 
@@ -29,6 +31,11 @@ public:
 
 	string getUserName();
 	//void setUserName(string s);
+
+	void viewHistory();
+	void addToHistory(vector<User>& users, string userName, double balance, int userPosition);
+
+	stack<Transaction> GetTransaction();
 
 	string getPassword();
 	void setPassword(string s);
