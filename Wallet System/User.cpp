@@ -18,6 +18,55 @@ User::User(string name, string pass, double bal)
 	status = Status::Active;
 }
 
+void User::userRegister(map<string, User>& users)
+{
+
+	string Username;
+	string Password;
+	bool has_upper = false;  //to check if the passowrd has atleast one uppercase
+	cout << "Hi! Let`s get started \n\n";
+	while (true)
+	{
+		cout << "Please enter user name\n\n";
+		cin >> Username;
+		if (users.find(Username) != users.end()) {
+			cout << "Sorry this user name is already exist!\n\n";
+			continue;
+		}
+		else break;
+	}
+	while (true)
+	{
+
+
+		cout << "Please enter you`re password \n\n";
+
+		cin >> Password;
+		if (Password.length() < 8) {
+			cout << "Please make sure you`er password length atleast 8 letters\n\n";
+			continue;
+		}
+		for (char pass : Password) {
+			if (isupper(pass)) {
+				has_upper = true;
+				break;
+			}
+
+		}
+		if (has_upper == true) {
+			cout << "DONE\n\n";
+			break;
+		}
+		if (has_upper != true) {
+			cout << "Please make sure that you have atleast one uppercase letter\n\n";
+			continue;
+		}
+
+	}
+	users[Username] = User(Username, Password, 1000);
+
+}
+
 bool User::makeTransaction(map<string, User> &users,string reciever, double amount)
 {
 	//check suspended accounts

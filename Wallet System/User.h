@@ -28,8 +28,7 @@ public:
 	User();
 	User(string, string, double);
 
-	void userRegister();
-	void login();
+	void static userRegister(map<string, User>&);
 
 	bool makeTransaction(map<string, User> &users,string userName, double balance);
 
