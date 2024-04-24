@@ -3,7 +3,8 @@
 #include "Transaction.h"
 #include <vector>
 #include <stack>
-#include <map>
+#include <map>]
+#include<queue>
 
 using namespace std;
 
@@ -20,7 +21,7 @@ class User
 	string password;
 	double balance = 0;
 	stack <Transaction> historyOfTransaction;
-	
+	queue<Transaction> transactionQueue;
 	Status status;
 
 	//methodes
@@ -28,9 +29,13 @@ public:
 	User();
 	User(string, string, double);
 
-	void static userRegister(map<string, User>&);
+	void userRegister();
+	void login();
 
-	bool makeTransaction(map<string, User> &users,string userName, double balance);
+	bool makeTransaction(map<string, User>& users, string reciever, double amount);
+	bool requestTransaction(map<string, User>& users, string sender, double amount);
+	void addRequest(map<string, User>& users, string request_reciever, double amount);
+	void viewRequets(map<string, User>& users);
 
 	~User();
 
@@ -44,6 +49,8 @@ public:
 
 	string getPassword();
 	void setPassword(string s);
+
+	Status getStatus();
 
 	double getBalance();
 	void addToBalance(double amount);

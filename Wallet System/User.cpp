@@ -18,59 +18,10 @@ User::User(string name, string pass, double bal)
 	status = Status::Active;
 }
 
-void User::userRegister(map<string, User>& users)
-{
-
-	string Username;
-	string Password;
-	bool has_upper = false;  //to check if the passowrd has atleast one uppercase
-	cout << "Hi! Let`s get started \n\n";
-	while (true)
-	{
-		cout << "Please enter user name\n\n";
-		cin >> Username;
-		if (users.find(Username) != users.end()) {
-			cout << "Sorry this user name is already exist!\n\n";
-			continue;
-		}
-		else break;
-	}
-	while (true)
-	{
-
-
-		cout << "Please enter you`re password \n\n";
-
-		cin >> Password;
-		if (Password.length() < 8) {
-			cout << "Please make sure you`er password length atleast 8 letters\n\n";
-			continue;
-		}
-		for (char pass : Password) {
-			if (isupper(pass)) {
-				has_upper = true;
-				break;
-			}
-
-		}
-		if (has_upper == true) {
-			cout << "DONE\n\n";
-			break;
-		}
-		if (has_upper != true) {
-			cout << "Please make sure that you have atleast one uppercase letter\n\n";
-			continue;
-		}
-
-	}
-	users[Username] = User(Username, Password, 1000);
-
-}
-
-bool User::makeTransaction(map<string, User> &users,string reciever, double amount)
+bool User::makeTransaction(map<string, User>& users, string reciever, double amount)
 {
 	//check suspended accounts
-	
+
 	if (status == Status::Suspend)
 	{
 		cout << "Can not make transaction!\nReason: Account is suspended\n\n";
@@ -79,10 +30,10 @@ bool User::makeTransaction(map<string, User> &users,string reciever, double amou
 
 	//enter password
 	string passCheck;
-	
+
 	cout << "Enter Password: ";
 	cin >> passCheck;
-	
+
 	if (password != passCheck)
 	{
 		cout << "Can not make transaction!\nReason: wrong password\n\n";
@@ -90,7 +41,7 @@ bool User::makeTransaction(map<string, User> &users,string reciever, double amou
 	}
 
 	//find the user that you want to send to
-	
+
 	if (users.find(reciever) == users.end())
 	{
 		cout << "Can not make transaction!\nReason: User not found\n\n";
@@ -110,10 +61,68 @@ bool User::makeTransaction(map<string, User> &users,string reciever, double amou
 
 	cout << "successfull Transaction!\n\n";
 
-	addToHistory(users, reciever,  amount);
+	addToHistory(users, reciever, amount);
 
 	return true;
 }
+
+bool User::requestTransaction(map<string, User>& users, string request_reciever, double amount)
+{
+	if (status == Status::Suspend)
+	{
+		cout << "Can not make transaction!\nReason: Account is suspended\n\n";
+		return false;
+	}
+	if (users.find(request_reciever) == users.end())
+	{
+		cout << "Can not make transaction!\nReason: Sender not found\n\n";
+		return false;
+	}
+	if (users[request_reciever].getStatus() == Suspend)
+	{
+		cout << "Can not make transaction!\nReason: Sender is suspended\n\n";
+		return false;
+	}
+	addRequest(users, request_reciever, amount);
+
+}
+
+void User::addRequest(map<string, User>& users, string request_reciever, double amount)
+{
+	Transaction t(request_reciever, userName, amount);
+	users[request_reciever].transactionQueue.push(t);
+}
+
+void User::viewRequets(map<string, User>& users)
+{
+	Transaction t = transactionQueue.front();
+	cout << "The user number " << t.Get_Reciver() << " Requests from you " << t.Get_Amount() << " dollars" << endl;
+
+	string ans;
+	do
+	{
+		cout << "Enter yes to agree on the transaction no otherwise(yes / no)\n";
+		cin >> ans;
+	} while (ans != "yes" && ans != "no");
+	if (ans == "yes")
+	{
+		if (balance < t.Get_Amount())
+		{
+			cout << "Your balance is not enough please charge and try again\n";
+			return;
+		}
+		balance -= t.Get_Amount();
+		users[t.Get_Reciver()].addToBalance(t.Get_Amount());
+		addToHistory(users, t.Get_Reciver(), t.Get_Amount());
+		transactionQueue.pop();
+	}
+	else if (ans == "no")
+	{
+		transactionQueue.pop();
+	}
+
+}
+
 
 void User::addToHistory(map<string, User>& users, string reciever, double amount)
 {
@@ -127,7 +136,7 @@ stack<Transaction>& User::GetTransaction()
 	return historyOfTransaction;
 }
 
-string User::getUserName() 
+string User::getUserName()
 {
 	return User::userName;
 }
@@ -148,7 +157,12 @@ void User::setPassword(string s)
 	User::password = s;
 }
 
-double User::getBalance() 
+Status User::getStatus()
+{
+	return status;
+}
+
+double User::getBalance()
 {
 	return balance;
 }
@@ -157,7 +171,7 @@ void User::addToBalance(double amount)
 	cout << User::userName << " balance before: " << balance << endl;
 	balance += amount;
 	cout << User::userName << " balance after: " << balance << endl;
-} 
+}
 void User::setBalance(double b)
 {
 	cout << User::userName << " balance before: " << balance << endl;
