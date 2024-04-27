@@ -29,21 +29,29 @@ public:
 	User();
 	User(string, string, double);
 
-	void userRegister();
-	void login();
+	void static userRegister(map<string, User>&);
+	string static login(map<string, User>& users);
 
-	bool makeTransaction(map<string, User>& users, string reciever, double amount);
+	//make a transactoin
+	bool makeTransaction(map<string, User>& users);
+
+	//transactions history
+	void addToHistory(map<string, User>& users, string userName, double balance);
+	void viewHistory();
+
+	//requests
 	bool requestTransaction(map<string, User>& users, string sender, double amount);
 	void addRequest(map<string, User>& users, string request_reciever, double amount);
 	void viewRequets(map<string, User>& users);
 
-	~User();
+	//edit password
+	int EditPassword();
+	void displayUserInfo();
 
+	//getters and setters
 	string getUserName();
 	//void setUserName(string s);
 
-	void viewHistory();
-	void addToHistory(map<string, User>& users, string userName, double balance);
 
 	stack<Transaction>& GetTransaction();
 
@@ -56,4 +64,6 @@ public:
 	void addToBalance(double amount);
 	void setBalance(double d);
 
+	//dest.
+	~User();
 };
