@@ -64,6 +64,8 @@ public:
 	void addToBalance(double amount);
 	void setBalance(double d);
 
+	void SetStatus(Status);
+
 	//dest.
 	~User();
 };

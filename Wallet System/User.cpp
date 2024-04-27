@@ -83,7 +83,7 @@ string User::login(map<string, User>& users)
 		return "";
 	}
 
-	if (users[userName].getPassword() != password)
+	if (users[userName].getPassword() != pass)
 	{
 		cout << "Can not login!\nReason: Wrong password.\n\n";
 		return "";
@@ -340,6 +340,11 @@ void User::setBalance(double b)
 	cout << User::userName << " balance before: " << balance << endl;
 	balance = b;
 	cout << User::userName << " balance after: " << balance << endl;
+}
+
+void User::SetStatus(Status s)
+{
+	status = s;
 }
 
 //dest.
