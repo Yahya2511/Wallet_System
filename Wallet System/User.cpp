@@ -30,6 +30,8 @@ void User::userRegister(map<string, User>& users)
 	{
 		cout << "Please enter user name\n\n";
 		cin >> Username;
+		cin.ignore();
+
 		if (users.find(Username) != users.end()) {
 			cout << "Sorry this user name is already exist!\n\n";
 			continue;
@@ -43,6 +45,8 @@ void User::userRegister(map<string, User>& users)
 		cout << "Please enter you`re password \n\n";
 
 		cin >> Password;
+		cin.ignore();
+
 		if (Password.length() < 8) {
 			cout << "Please make sure you`er password length atleast 8 letters\n\n";
 			continue;
@@ -72,10 +76,12 @@ string User::login(map<string, User>& users)
 	string userName;
 	cout << "Enter user name: ";
 	cin >> userName;
+	cin.ignore();
 
 	string pass;
 	cout << "Enter password: ";
 	cin >> pass;
+	cin.ignore();
 
 	if (users.find(userName) == users.end())
 	{
@@ -94,31 +100,36 @@ string User::login(map<string, User>& users)
 }
 
 //make transaction
-bool User::makeTransaction(map<string, User>& users)
+void User::makeTransaction(map<string, User>& users)
 {
 	//check suspended accounts
 
 	if (status == Status::Suspend)
 	{
 		cout << "Can not make transaction!\nReason: Account is suspended\n\n";
-		return false;
+		return;
 	}
 
 	string receiver;
 	cout << "Enter the name of the user you want to make transactoin to: ";
 	cin >> receiver;
-	
+	cin.ignore();
 
-	//enter password
+	if (receiver == userName)
+	{
+		cout << "Can not send money to self!\n\n";
+		return;
+	}
+
 	string passCheck;
-
 	cout << "Enter Password: ";
 	cin >> passCheck;
+	cin.ignore();
 
 	if (password != passCheck)
 	{
 		cout << "Can not make transaction!\nReason: wrong password\n\n";
-		return false;
+		return;
 	}
 
 	//find the user that you want to send to
@@ -126,17 +137,19 @@ bool User::makeTransaction(map<string, User>& users)
 	if (users.find(receiver) == users.end())
 	{
 		cout << "Can not make transaction!\nReason: User not found\n\n";
-		return false;
+		return;
 	}
 
 	int amount;
 	cout << "Enter the amount of money you want to transfer.";
 	cin >> amount;
+	cin.ignore();
+
 	//check amount
 	if (balance < amount)
 	{
 		cout << "Can not make transaction!\nReason: do not have enough money\n\n";
-		return false;
+		return;
 	}
 
 	//make transaction
@@ -147,7 +160,7 @@ bool User::makeTransaction(map<string, User>& users)
 
 	addToHistory(users, receiver, amount);
 
-	return true;
+	return;
 }
 
 //transactions history
@@ -217,6 +230,8 @@ void User::viewRequets(map<string, User>& users)
 	{
 		cout << "Enter yes to agree on the transaction no otherwise(yes / no)\n";
 		cin >> ans;
+		cin.ignore();
+
 	} while (ans != "yes" && ans != "no");
 	if (ans == "yes")
 	{
@@ -242,7 +257,9 @@ int User::EditPassword() {
 
 	string oldPassword, newPassword;
 
-	cout << "Enter your old password: \n"; cin >> oldPassword;
+	cout << "Enter your old password: \n"; 
+	cin >> oldPassword;
+	cin.ignore();
 
 	int i = 2;
 
@@ -252,6 +269,8 @@ int User::EditPassword() {
 		cout << "Old password is incorrect.\nEnter password again : " << endl;
 
 		cin >> oldPassword;
+		cin.ignore();
+
 
 		i--;
 
@@ -269,10 +288,13 @@ int User::EditPassword() {
 	cout << "Enter a new password (at least 8 characters long): ";
 
 
-	do {
+	do 
+	{
 
 
 		cin >> newPassword;
+		cin.ignore();
+
 
 		if (newPassword.length() < 8)
 
@@ -337,9 +359,7 @@ void User::addToBalance(double amount)
 }
 void User::setBalance(double b)
 {
-	cout << User::userName << " balance before: " << balance << endl;
 	balance = b;
-	cout << User::userName << " balance after: " << balance << endl;
 }
 
 void User::SetStatus(Status s)

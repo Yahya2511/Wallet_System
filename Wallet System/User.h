@@ -33,7 +33,7 @@ public:
 	string static login(map<string, User>& users);
 
 	//make a transactoin
-	bool makeTransaction(map<string, User>& users);
+	void makeTransaction(map<string, User>& users);
 
 	//transactions history
 	void addToHistory(map<string, User>& users, string userName, double balance);

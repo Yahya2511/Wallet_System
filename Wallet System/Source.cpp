@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include "User.h"
 #include "Transaction.h"
 #include <vector>
@@ -6,6 +7,10 @@
 #include <map>
 
 using namespace std;
+
+
+int getInt();
+
 
 int main()
 {
@@ -16,14 +21,18 @@ int main()
 	//ctime_s(tm, sizeof tm, &curr_time);
 	//std::cout << "Today is : " << tm;
 
-	map<string, User> users;
-	
 	string activeUser = "";
 
 	bool runProgram = true;
 	bool inWelcome = true;
 	bool inHome = false;
+	bool inAdmin= false;
 
+	map<string, User> users;
+
+	users["user1"] = User("user1", "pass1", 1000);
+	users["user2"] = User("user2", "pass2", 1000);
+	users["user3"] = User("user3", "pass3", 1000);
 
 	while (runProgram)
 	{
@@ -37,7 +46,7 @@ int main()
 				"3. Exit.\n" <<
 				"Choice: ";
 
-			cin >> choice;
+			choice = getInt();
 
 			//Login.
 			if (choice == 1)
@@ -64,6 +73,12 @@ int main()
 				runProgram = false;
 			}
 
+			//word as input
+			else if (choice == -1)
+			{
+				cout << "invalid input!\nYou can not use words here!\n\n";
+			}
+			
 			//else.
 			else
 			{
@@ -84,7 +99,7 @@ int main()
 				"6. Exit.\n" <<
 				"Choice: ";
 
-			cin >> choice;
+			choice = getInt();
 
 			//View Balance.
 			if (choice == 1)
@@ -92,6 +107,7 @@ int main()
 				cout << "Enter your password: ";
 				string pass;
 				cin >> pass;
+				cin.ignore();
 
 				if (pass == users[activeUser].getPassword())
 					cout << "Your current balance is: " << users[activeUser].getBalance() << "\n\n";
@@ -113,10 +129,12 @@ int main()
 				cout << "Enter user name that you want to make transaction to: ";
 				string receiver;
 				cin >> receiver;
+				cin.ignore();
 				
 				cout << "Enter amount of money you want to send to him: ";
 				double amount;
 				cin >> amount;
+				cin.ignore();
 
 				users[activeUser].requestTransaction(users, receiver, amount);
 			}
@@ -142,6 +160,12 @@ int main()
 				runProgram = false;
 			}
 
+			//word as input
+			else if (choice == -1)
+			{
+				cout << "invalid input!\nYou can not use words here!\n\n";
+			}
+
 			//else.
 			else
 			{
@@ -150,4 +174,28 @@ int main()
 		}
 	}
 	return 0;
+}
+
+int getInt()
+{
+	string input;
+	int number = 0;
+	getline(cin, input, '\n');
+
+	if (input.length() > 3)
+		return -1;
+
+	bool notInt = false;
+	for (char c : input)
+	{
+		if (c >= '0' && c <= '9') 
+		{
+			number = number * 10 + (c - '0');
+		}
+		else
+		{
+			return -1;
+		}
+	}
+	return number;
 }
