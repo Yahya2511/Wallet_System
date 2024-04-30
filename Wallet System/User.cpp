@@ -141,7 +141,7 @@ void User::makeTransaction(map<string, User>& users)
 	}
 
 	int amount;
-	cout << "Enter the amount of money you want to transfer.";
+	cout << "Enter the amount of money you want to transfer: ";
 	cin >> amount;
 	cin.ignore();
 
@@ -168,7 +168,7 @@ void User::addToHistory(map<string, User>& users, string receiver, double amount
 {
 	Transaction t = Transaction(userName, receiver, amount);
 	historyOfTransaction.push(t);
-	users[receiver].GetTransaction().push(t);
+	users[receiver].getTransaction().push(t);
 }
 void User::viewHistory()
 {
@@ -253,7 +253,7 @@ void User::viewRequets(map<string, User>& users)
 }
 
 //edit password
-int User::EditPassword() {
+int User::editPassword() {
 
 	string oldPassword, newPassword;
 
@@ -312,26 +312,20 @@ int User::EditPassword() {
 }
 void User::displayUserInfo() 
 {
-	cout << "Username: " << User::userName << '\n' << "Password:" << User::password << endl;
+	cout << "Username: " << User::userName << '\n' 
+		<< "Password: " << User::password << '\n'
+		<< "Balance: " << User::balance << "\n\n";
 }
 
 //getters and setters
-stack<Transaction>& User::GetTransaction()
-{
-	return historyOfTransaction;
-}
-
 string User::getUserName()
 {
 	return User::userName;
 }
-/*
- need some coditions first
 void User::setUserName(string s)
 {
-	User::userName = s;
+	userName = s;
 }
-*/
 
 string User::getPassword()
 {
@@ -342,29 +336,45 @@ void User::setPassword(string s)
 	User::password = s;
 }
 
-Status User::getStatus()
-{
-	return status;
-}
-
 double User::getBalance()
 {
 	return balance;
 }
 void User::addToBalance(double amount)
 {
-	cout << User::userName << " balance before: " << balance << endl;
 	balance += amount;
-	cout << User::userName << " balance after: " << balance << endl;
 }
 void User::setBalance(double b)
 {
 	balance = b;
 }
 
-void User::SetStatus(Status s)
+Status User::getStatus()
+{
+	return status;
+}
+void User::setStatus(Status s)
 {
 	status = s;
+}
+
+stack<Transaction>& User::getTransaction()
+{
+	return historyOfTransaction;
+}
+
+void User::addTransactionToStack(Transaction t)
+{
+	historyOfTransaction.push(t);
+}
+void User::addTransactionToQueue(Transaction t)
+{
+	historyOfTransaction.push(t);
+}
+
+queue<Transaction>& User::getQueue()
+{
+	return transactionQueue;
 }
 
 //dest.

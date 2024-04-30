@@ -81,7 +81,7 @@ void Admin::SuspendUser(string& userName)
     map<string, User>::iterator it = users.find(userName);
     if (it != users.end()) 
     {
-        it->second.SetStatus(Suspend);
+        it->second.setStatus(Suspend);
         cout << "User " << userName << " has been suspended." << endl;
     }
     else 
@@ -95,7 +95,7 @@ void Admin::ReactivateUser(string& userName)
     map<string, User>::iterator it = users.find(userName);
     if (it != users.end()) 
     {
-        it->second.SetStatus(Active);
+        it->second.setStatus(Active);
         cout << "User " << userName << " has been reactivated." << endl;
     }
     else 
