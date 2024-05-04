@@ -34,16 +34,16 @@ public:
 	string static login(map<string, User>& users);
 
 	//make a transactoin
-	void makeTransaction(map<string, User>& users);
+	void makeTransaction(map<string, User>& users, stack<Transaction>& sysHistory);
 
 	//transactions history
-	void addToHistory(map<string, User>& users, string userName, double balance);
+	void addToHistory(map<string, User>& users, stack<Transaction>& sysHistory, string userName, double balance);
 	void viewHistory();
 
 	//requests
 	bool requestTransaction(map<string, User>& users);
 	void addRequest(map<string, User>& users, string request_reciever, double amount);
-	void viewRequets(map<string, User>& users);
+	void viewRequets(map<string, User>& users, stack<Transaction>& sysHistory);
 
 	//edit password
 	int editPassword();
