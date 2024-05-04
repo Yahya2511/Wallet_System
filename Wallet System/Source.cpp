@@ -6,6 +6,7 @@
 
 #include "User.h"
 #include "Transaction.h"
+#include "Admin.h"
 #include "ctime"
 
 using namespace std;
@@ -15,14 +16,14 @@ void loadUsers(map<string, User>& users, string fileName);
 void saveUsers(map<string, User>& users, string fileName);
 int getInt();
 
-	/*
-	time_t curr_time;
-	curr_time = time(NULL);
-	
-	char tm[26]; // Buffer to hold the time string
-	ctime_s(tm, sizeof tm, &curr_time);
-	std::cout << "Today is : " << tm;
-	*/
+/*
+time_t curr_time;
+curr_time = time(NULL);
+
+char tm[26]; // Buffer to hold the time string
+ctime_s(tm, sizeof tm, &curr_time);
+std::cout << "TodayÂ isÂ :Â " << tm;
+*/
 
 int main()
 {
@@ -33,10 +34,14 @@ int main()
 	bool runProgram = true;
 	bool inWelcome = true;
 	bool inHome = false;
-	bool inAdmin= false;
+	bool inAdmin = false;
 
 	map<string, User> users;
 	map<string, User>::iterator it;
+
+	Admin admin;
+
+	stack<Transaction> systemHistory;
 
 	loadUsers(users, fileName);
 
@@ -84,7 +89,7 @@ int main()
 			{
 				cout << "invalid input!\nYou can not use words here!\n\n";
 			}
-			
+
 			//else.
 			else
 			{
@@ -95,14 +100,15 @@ int main()
 		while (inHome)
 		{
 			int choice;
-			cout << "Hi " << activeUser << "\n\n" << 
+			cout << "Hi " << activeUser << "\n\n" <<
 				"Enter the operation you want to select\n" <<
 				"1. View Balance.\n" <<
 				"2. Make Transaction.\n" <<
-				"3. Make a Request.\n" << 
-				"4. Edit Password.\n" << 
-				"5. Logout.\n" << 
-				"6. Exit.\n" <<
+				"3. Make a Request.\n" <<
+				"4. Edit Password.\n" <<
+				"5. View History.\n" <<
+				"6. Logout.\n" <<
+				"7. Exit.\n" <<
 				"Choice: ";
 
 			choice = getInt();
@@ -120,13 +126,13 @@ int main()
 
 				else
 					cout << "Wrong password!\n\n";
-				
+
 			}
 
 			//Make Transaction.
 			else if (choice == 2)
 			{
-				users[activeUser].makeTransaction(users);
+				users[activeUser].makeTransaction(users, systemHistory);
 			}
 
 			//Make a Request.
@@ -136,7 +142,7 @@ int main()
 				string receiver;
 				cin >> receiver;
 				cin.ignore();
-				
+
 				cout << "Enter amount of money you want from him: ";
 				double amount;
 				cin >> amount;
@@ -151,8 +157,15 @@ int main()
 				users[activeUser].editPassword();
 			}
 
+			//view history
+			if (choice == 5)
+			{
+				users[activeUser].viewHistory();
+			}
+
+
 			//Logout.
-			else if (choice == 5)
+			else if (choice == 6)
 			{
 				activeUser = "";
 				inHome = false;
@@ -160,7 +173,7 @@ int main()
 			}
 
 			//Exit.
-			else if (choice == 6)
+			else if (choice == 7)
 			{
 				inHome = false;
 				runProgram = false;
@@ -179,6 +192,8 @@ int main()
 			}
 		}
 	}
+
+	admin.ViewUniTransaction(systemHistory);
 
 	saveUsers(users, fileName);
 	return 0;
@@ -220,7 +235,7 @@ void loadUsers(map<string, User>& users, string fileName)
 			users[userKey].setStatus(Status::Active);
 		else
 			users[userKey].setStatus(Status::Suspend);
-			
+
 
 		data >> userBalance;
 		data.ignore();
@@ -282,10 +297,10 @@ void saveUsers(map<string, User>& users, string fileName)
 		cout << "Error opening file!!!!" << endl;
 		exit(1);
 	}
-	
+
 	map<string, User>::iterator it;
 
-	
+
 	data << users.size() << endl;
 
 	for (it = users.begin(); it != users.end(); it++)
@@ -305,7 +320,7 @@ void saveUsers(map<string, User>& users, string fileName)
 		for (int i = 0; i < historySize; i++)
 		{
 			data << it->second.getTransaction().top().Get_Sender() << '|' <<
-				it->second.getTransaction().top().Get_Reciver() << "\n" << 
+				it->second.getTransaction().top().Get_Reciver() << "\n" <<
 				it->second.getTransaction().top().Get_Amount() << "\n";
 		}
 
@@ -336,7 +351,7 @@ int getInt()
 	bool notInt = false;
 	for (char c : input)
 	{
-		if (c >= '0' && c <= '9') 
+		if (c >= '0' && c <= '9')
 		{
 			number = number * 10 + (c - '0');
 		}
