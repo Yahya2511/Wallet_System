@@ -1,6 +1,7 @@
 #include "Admin.h"
 #include "User.h"
 
+
 Admin::Admin()
 {
 	adminName = "Admin";
@@ -40,6 +41,32 @@ void Admin::AddUser(map<string, User>& users, double balance)
     }
 }
 
+void Admin::ViewUniTransaction(stack<Transaction> sysHistory)
+{
+    cout << "HERE IS THE TRANSACTIONS : \n";
+    if (sysHistory.empty())
+    {
+        cout << "There is No history\n";
+        return;
+    }
+    stack <Transaction>temproryStack;
+    temproryStack = sysHistory;
+    while (!temproryStack.empty())
+    {
+        cout << "The sender is " << temproryStack.top().Get_Sender();
+        cout << "\t";
+        cout << "The amount is " << temproryStack.top().Get_Amount();
+        cout << "\t";
+        cout << "The reciever is " << temproryStack.top().Get_Reciver();
+        cout << "\t";
+        cout << "on " << temproryStack.top().Get_date();
+        cout << "\n";
+        cout << "*********************************************";
+        cout << "\n";
+        temproryStack.pop();
+    }
+
+}
 // edited part is removing current pass and new pass form the function atribute.
 
 //Note this code can be cleaner by applying the if(!true){return}
