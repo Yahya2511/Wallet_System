@@ -1,6 +1,6 @@
 #include "User.h"
-#include <string>
 #include "Transaction.h"
+#include "Admin.h"
 
 //const.
 User::User()
@@ -24,8 +24,10 @@ void User::userRegister(map<string, User>& users)
 
 	string Username;
 	string Password;
-	bool has_upper = false;  //to check if the passowrd has atleast one uppercase
+	bool has_upper = false;//to check if the passowrd has atleast one uppercase
+	bool has_number = false;//to check if the passowrd has atleast one number
 	cout << "Hi! Let`s get started \n\n";
+
 	while (true)
 	{
 		cout << "Please enter user name\n\n";
@@ -40,10 +42,7 @@ void User::userRegister(map<string, User>& users)
 	}
 	while (true)
 	{
-
-
 		cout << "Please enter you`re password \n\n";
-
 		cin >> Password;
 		cin.ignore();
 
@@ -52,18 +51,31 @@ void User::userRegister(map<string, User>& users)
 			continue;
 		}
 		for (char pass : Password) {
+
 			if (isupper(pass)) {
 				has_upper = true;
 				break;
 			}
 
 		}
-		if (has_upper == true) {
-			cout << "DONE\n\n";
+		for (char Pass : Password) {
+
+			if (isdigit(Pass)) {
+				has_number = true;
+				break;
+			}
+		}
+
+		if (has_upper == true && has_number == true) {
+			cout << "DONE!\n\n";
 			break;
 		}
 		if (has_upper != true) {
 			cout << "Please make sure that you have atleast one uppercase letter\n\n";
+			continue;
+		}
+		if (has_number != true) {
+			cout << "Please make sure that you have atleast one number\n\n";
 			continue;
 		}
 
@@ -82,6 +94,11 @@ string User::login(map<string, User>& users)
 	cout << "Enter password: ";
 	cin >> pass;
 	cin.ignore();
+
+	if (Admin::login(userName, pass) == true)
+	{
+		return userName;
+	}
 
 	if (users.find(userName) == users.end())
 	{
@@ -195,13 +212,16 @@ void User::viewHistory()
 }
 
 //requests
-bool User::requestTransaction(map<string, User>& users, string requestReceiver, double amount)
+bool User::requestTransaction(map<string, User>& users)
 {
 	if (status == Status::Suspend)
 	{
 		cout << "Can not make transaction!\nReason: Account is suspended\n\n";
 		return false;
 	}
+	string requestReceiver;
+	cout << "Enter the name of the user you want to request transaction from : ";
+	cin >> requestReceiver;
 	if (users.find(requestReceiver) == users.end())
 	{
 		cout << "Can not make transaction!\nReason: Sender not found\n\n";
@@ -212,8 +232,11 @@ bool User::requestTransaction(map<string, User>& users, string requestReceiver, 
 		cout << "Can not make transaction!\nReason: Sender is suspended\n\n";
 		return false;
 	}
+	cout << "Enter the amount of money you want to request: ";
+	double amount;
+	cin >> amount;
+	cin.ignore();
 	addRequest(users, requestReceiver, amount);
-
 }
 void User::addRequest(map<string, User>& users, string requestReceiver, double amount)
 {

@@ -1,10 +1,10 @@
 #pragma once
 #include <iostream>
-#include "Transaction.h"
 #include <vector>
 #include <stack>
 #include <map>
-#include<queue>
+#include <queue>
+#include "Transaction.h"
 
 using namespace std;
 
@@ -23,7 +23,7 @@ class User
 	Status status;
 
 	stack <Transaction> historyOfTransaction;
-	queue<Transaction> transactionQueue;
+	queue <Transaction> transactionQueue;
 
 	//methodes
 public:
@@ -41,7 +41,7 @@ public:
 	void viewHistory();
 
 	//requests
-	bool requestTransaction(map<string, User>& users, string sender, double amount);
+	bool requestTransaction(map<string, User>& users);
 	void addRequest(map<string, User>& users, string request_reciever, double amount);
 	void viewRequets(map<string, User>& users);
 

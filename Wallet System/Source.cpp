@@ -142,7 +142,7 @@ int main()
 				cin >> amount;
 				cin.ignore();
 
-				users[activeUser].requestTransaction(users, receiver, amount);
+				users[activeUser].requestTransaction(users);
 			}
 
 			//Eidt Password.

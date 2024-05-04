@@ -1,68 +1,73 @@
 #include "Admin.h"
 #include "User.h"
-#include<iostream>
-#include<vector>
-#include<map>
-#include<iterator>
-#include <string>
 
-using namespace std;
-
-Admin::Admin() 
+Admin::Admin()
 {
-    adminName = "0";
-    adminId = 0;
+	adminName = "Admin";
+	adminId = 1;
 }
 
-void Admin::AddUser(double initialBalance) 
+bool Admin::login(string Username, string Password)
 {
-    while (true) {
+    if (Username == "admin" && Password == "admin") {
+        return true;
+    }
+    else
+        return false;
+}
+
+void Admin::AddUser(map<string, User>& users, double balance)
+{
+    while (true) 
+    {
         string userName;
         cout << "Please enter user name\n\n";
         cin >> userName;
+
         if (users.find(userName) != users.end()) 
         {
             cout << "Sorry, this user name already exists!\n\n";
             continue;
         }
+
         else 
         {
-            User user(userName, "1", initialBalance);
+            User user(userName, "1", balance);
             users[userName] = user;
             cout << "User " << userName << " added successfully!\n\n";
             break;
         }
     }
 }
-void Admin::EditusersPassword(string& userName, string& currentPassword, string& newPassword) 
+
+// edited part is removing current pass and new pass form the function atribute.
+
+//Note this code can be cleaner by applying the if(!true){return}
+
+void Admin::EditUsersPassword(map<string, User>& users, string userName) 
 {
+    string currentPassword, newPassword;
     map<string, User>::iterator it = users.find(userName);
     if (users.find(userName) != users.end()) 
     {
         cout << "Enter current password for user " << userName << ":\n";
         cin >> currentPassword;
-        if (it->second.getPassword() == currentPassword) 
+        if (it->second.getPassword() == currentPassword)
         {
             cout << "Enter new password for user " << userName << ":\n";
             cin >> newPassword;
+
             it->second.setPassword(newPassword);
             cout << "Password for user " << userName << " has been updated.\n";
         }
-        else 
-        {
+        else
             cout << "Incorrect current password.\n";
-        }
-
-
     }
-    else 
-    {
+    else
         cout << "User " << userName << " not found.\n";
-    }
 }
 
-void Admin::DeleteUser(string& userName)
-
+void Admin::DeleteUser(map<string, User>& users, string userName)
 {
     map<string, User>::iterator it = users.find(userName);
     if (it != users.end()) 
@@ -72,12 +77,10 @@ void Admin::DeleteUser(string& userName)
     }
     else
         cout << "User " << userName << " not found.\n";
-
 }
 
-void Admin::SuspendUser(string& userName)
+void Admin::SuspendUser(map<string, User>& users, string userName)
 {
-
     map<string, User>::iterator it = users.find(userName);
     if (it != users.end()) 
     {
@@ -85,21 +88,31 @@ void Admin::SuspendUser(string& userName)
         cout << "User " << userName << " has been suspended." << endl;
     }
     else 
-    {
         cout << "User " << userName << " not found." << endl;
-    }
 }
 
-void Admin::ReactivateUser(string& userName)
+void Admin::ReactivateUser(map<string, User>& users, string userName)
 {
     map<string, User>::iterator it = users.find(userName);
-    if (it != users.end()) 
+    if (it != users.end())
     {
         it->second.setStatus(Active);
         cout << "User " << userName << " has been reactivated." << endl;
     }
-    else 
-    {
+    else
         cout << "User " << userName << " not found." << endl;
+}
+
+void Admin::viewUsersInfo(map<string, User>& users)
+{
+    int size = users.size();
+    map<string, User>::iterator it = users.begin();
+    while (it != users.end())
+    {
+        cout << "User Name: " << it->first << endl;
+        cout << "User Balance: " << it->second.getBalance() << endl;
+        cout << "Transaction history : " << endl;
+        it->second.viewHistory();
+        it++;
     }
 }
