@@ -117,7 +117,7 @@ string User::login(map<string, User>& users)
 }
 
 //make transaction
-void User::makeTransaction(map<string, User>& users)
+void User::makeTransaction(map<string, User>& users, stack<Transaction>& sysHistory)
 {
 	//check suspended accounts
 
@@ -175,18 +175,22 @@ void User::makeTransaction(map<string, User>& users)
 
 	cout << "successfull Transaction!\n\n";
 
-	addToHistory(users, receiver, amount);
+	addToHistory(users, sysHistory, receiver, amount);
 
 	return;
 }
 
 //transactions history
-void User::addToHistory(map<string, User>& users, string receiver, double amount)
+void User::addToHistory(map<string, User>& users,stack<Transaction>& sysHistory, string receiver, double amount)
 {
 	Transaction t = Transaction(userName, receiver, amount);
 	historyOfTransaction.push(t);
+
+	sysHistory.push(t);
+
 	users[receiver].getTransaction().push(t);
-}
+
+	}
 void User::viewHistory()
 {
 	cout << "HERE IS THE TRANSACTIONS : \n";
@@ -204,6 +208,8 @@ void User::viewHistory()
 		cout << "The amount is " << temproryStack.top().Get_Amount();
 		cout << "\t";
 		cout << "The reciever is " << temproryStack.top().Get_Reciver();
+		cout << "\t";
+		cout << "on " << temproryStack.top().Get_date();
 		cout << "\n";
 		cout << "*********************************************";
 		cout << "\n";
@@ -243,7 +249,7 @@ void User::addRequest(map<string, User>& users, string requestReceiver, double a
 	Transaction t(requestReceiver, userName, amount);
 	users[requestReceiver].transactionQueue.push(t);
 }
-void User::viewRequets(map<string, User>& users)
+void User::viewRequets(map<string, User>& users, stack<Transaction>& sysHistory)
 {
 	Transaction t = transactionQueue.front();
 	cout << "The user number " << t.Get_Reciver() << " Requests from you " << t.Get_Amount() << " dollars" << endl;
@@ -265,7 +271,7 @@ void User::viewRequets(map<string, User>& users)
 		}
 		balance -= t.Get_Amount();
 		users[t.Get_Reciver()].addToBalance(t.Get_Amount());
-		addToHistory(users, t.Get_Reciver(), t.Get_Amount());
+		addToHistory(users, sysHistory, t.Get_Reciver(), t.Get_Amount());
 		transactionQueue.pop();
 	}
 	else if (ans == "no")
