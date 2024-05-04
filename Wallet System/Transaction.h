@@ -11,6 +11,7 @@ class Transaction
 	string sender;
 	string reciever;
 	double amount;
+	string date;
 
 
 	//methodes
@@ -21,6 +22,7 @@ public:
 	string Get_Sender();
 	string Get_Reciver();
 	double Get_Amount();
+	string Get_date();
 	~Transaction();
 
 };
