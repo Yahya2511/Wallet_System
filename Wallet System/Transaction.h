@@ -19,6 +19,7 @@ public:
 	
 	Transaction();
 	Transaction(string, string, double);
+	Transaction(string, string, string, double);
 	string Get_Sender();
 	string Get_Reciver();
 	double Get_Amount();

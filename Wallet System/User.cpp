@@ -19,7 +19,7 @@ User::User(string name, string pass, double bal)
 }
 
 //Login and register
-void User::userRegister(map<string, User>& users)
+void User::userRegister(unordered_map<string, User>& users)
 {
 
 	string Username;
@@ -83,7 +83,7 @@ void User::userRegister(map<string, User>& users)
 	users[Username] = User(Username, Password, 1000);
 
 }
-string User::login(map<string, User>& users)
+string User::login(unordered_map<string, User>& users)
 {
 	string userName;
 	cout << "Enter user name: ";
@@ -117,7 +117,7 @@ string User::login(map<string, User>& users)
 }
 
 //make transaction
-void User::makeTransaction(map<string, User>& users, stack<Transaction>& sysHistory)
+void User::makeTransaction(unordered_map<string, User>& users, stack<Transaction>& sysHistory)
 {
 	//check suspended accounts
 
@@ -138,8 +138,16 @@ void User::makeTransaction(map<string, User>& users, stack<Transaction>& sysHist
 		return;
 	}
 
+	//find the user that you want to send to
+
+	if (users.find(receiver) == users.end())
+	{
+		cout << "Can not make transaction!\nReason: User not found\n\n";
+		return;
+	}
+
 	string passCheck;
-	cout << "Enter Password: ";
+	cout << "Enter your Password: ";
 	cin >> passCheck;
 	cin.ignore();
 
@@ -149,13 +157,6 @@ void User::makeTransaction(map<string, User>& users, stack<Transaction>& sysHist
 		return;
 	}
 
-	//find the user that you want to send to
-
-	if (users.find(receiver) == users.end())
-	{
-		cout << "Can not make transaction!\nReason: User not found\n\n";
-		return;
-	}
 
 	int amount;
 	cout << "Enter the amount of money you want to transfer: ";
@@ -181,7 +182,7 @@ void User::makeTransaction(map<string, User>& users, stack<Transaction>& sysHist
 }
 
 //transactions history
-void User::addToHistory(map<string, User>& users,stack<Transaction>& sysHistory, string receiver, double amount)
+void User::addToHistory(unordered_map<string, User>& users,stack<Transaction>& sysHistory, string receiver, double amount)
 {
 	Transaction t = Transaction(userName, receiver, amount);
 	historyOfTransaction.push(t);
@@ -218,7 +219,7 @@ void User::viewHistory()
 }
 
 //requests
-bool User::requestTransaction(map<string, User>& users)
+bool User::requestTransaction(unordered_map<string, User>& users)
 {
 	if (status == Status::Suspend)
 	{
@@ -228,6 +229,8 @@ bool User::requestTransaction(map<string, User>& users)
 	string requestReceiver;
 	cout << "Enter the name of the user you want to request transaction from : ";
 	cin >> requestReceiver;
+	cin.ignore();
+
 	if (users.find(requestReceiver) == users.end())
 	{
 		cout << "Can not make transaction!\nReason: Sender not found\n\n";
@@ -244,13 +247,19 @@ bool User::requestTransaction(map<string, User>& users)
 	cin.ignore();
 	addRequest(users, requestReceiver, amount);
 }
-void User::addRequest(map<string, User>& users, string requestReceiver, double amount)
+void User::addRequest(unordered_map<string, User>& users, string requestReceiver, double amount)
 {
 	Transaction t(requestReceiver, userName, amount);
 	users[requestReceiver].transactionQueue.push(t);
 }
-void User::viewRequets(map<string, User>& users, stack<Transaction>& sysHistory)
+void User::viewRequest(unordered_map<string, User>& users, stack<Transaction>& sysHistory)
 {
+	if (transactionQueue.empty())
+	{
+		cout << "You have no requests.\n\n";
+		return;
+	}
+
 	Transaction t = transactionQueue.front();
 	cout << "The user number " << t.Get_Reciver() << " Requests from you " << t.Get_Amount() << " dollars" << endl;
 
@@ -398,7 +407,7 @@ void User::addTransactionToStack(Transaction t)
 }
 void User::addTransactionToQueue(Transaction t)
 {
-	historyOfTransaction.push(t);
+	User::transactionQueue.push(t);
 }
 
 queue<Transaction>& User::getQueue()

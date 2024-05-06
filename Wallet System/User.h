@@ -2,7 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <stack>
-#include <map>
+#include <unordered_map>
 #include <queue>
 #include "Transaction.h"
 
@@ -30,20 +30,20 @@ public:
 	User();
 	User(string, string, double);
 
-	void static userRegister(map<string, User>&);
-	string static login(map<string, User>& users);
+	void static userRegister(unordered_map<string, User>&);
+	string static login(unordered_map<string, User>& users);
 
 	//make a transactoin
-	void makeTransaction(map<string, User>& users, stack<Transaction>& sysHistory);
+	void makeTransaction(unordered_map<string, User>& users, stack<Transaction>& sysHistory);
 
 	//transactions history
-	void addToHistory(map<string, User>& users, stack<Transaction>& sysHistory, string userName, double balance);
+	void addToHistory(unordered_map<string, User>& users, stack<Transaction>& sysHistory, string userName, double balance);
 	void viewHistory();
 
 	//requests
-	bool requestTransaction(map<string, User>& users);
-	void addRequest(map<string, User>& users, string request_reciever, double amount);
-	void viewRequets(map<string, User>& users, stack<Transaction>& sysHistory);
+	bool requestTransaction(unordered_map<string, User>& users);
+	void addRequest(unordered_map<string, User>& users, string request_reciever, double amount);
+	void viewRequest(unordered_map<string, User>& users, stack<Transaction>& sysHistory);
 
 	//edit password
 	int editPassword();

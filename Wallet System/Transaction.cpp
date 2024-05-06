@@ -18,6 +18,14 @@ Transaction::Transaction(string s,string r,double amt)
 	date = tm;
 }
 
+Transaction::Transaction(string s, string r, string d, double amt)
+{
+	sender = s;
+	reciever = r;
+	amount = amt;
+	date = d;
+}
+
 string Transaction::Get_Sender()
 {
 	return sender;

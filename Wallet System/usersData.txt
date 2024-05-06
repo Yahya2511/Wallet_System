@@ -1,22 +1,28 @@
 3
 user1|pass1|Active
-500
+300
+2
+user1|user3|Sun, May, 5. 2024
+100
+user1|user3|Sun, May, 5. 2024
+200
 1
-user1|user2
-500
-0
+user1|user3|Sun, May, 5. 2024
+100
 
 user2|pass2|Active
-1500
+1700
 1
-user1|user2
+user1|user2|Sun, May, 5. 2024
+200
+1
+user2|user1|Sun, May, 5. 2024
 500
-0
 
 user3|pass3|Active
 1000
 1
-user3|user1
+user3|user1|Sun, May, 5. 2024
 200
 0
 

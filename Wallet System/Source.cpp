@@ -2,7 +2,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include <map>
+#include <unordered_map>
 
 #include "User.h"
 #include "Transaction.h"
@@ -11,19 +11,10 @@
 
 using namespace std;
 
-void loadUsers(map<string, User>& users, string fileName);
+void loadUsers(unordered_map<string, User>& users, string fileName);
 
-void saveUsers(map<string, User>& users, string fileName);
+void saveUsers(unordered_map<string, User>& users, string fileName);
 int getInt();
-
-/*
-time_t curr_time;
-curr_time = time(NULL);
-
-char tm[26]; // Buffer to hold the time string
-ctime_s(tm, sizeof tm, &curr_time);
-std::cout << "Today is : " << tm;
-*/
 
 int main()
 {
@@ -36,8 +27,8 @@ int main()
 	bool inHome = false;
 	bool inAdmin = false;
 
-	map<string, User> users;
-	map<string, User>::iterator it;
+	unordered_map<string, User> users;
+	unordered_map<string, User>::iterator it;
 
 	Admin admin;
 
@@ -65,9 +56,18 @@ int main()
 				string checkUserName = User::login(users);
 				if (checkUserName != "")
 				{
-					activeUser = checkUserName;
-					inWelcome = false;
-					inHome = true;
+					if (checkUserName == "Admin")
+					{
+						activeUser = checkUserName;
+						inWelcome = false;
+						inAdmin = true;
+					}
+					else
+					{
+						activeUser = checkUserName;
+						inWelcome = false;
+						inHome = true;
+					}
 				}
 			}
 
@@ -104,11 +104,12 @@ int main()
 				"Enter the operation you want to select\n" <<
 				"1. View Balance.\n" <<
 				"2. Make Transaction.\n" <<
-				"3. Make a Request.\n" <<
-				"4. Edit Password.\n" <<
-				"5. View History.\n" <<
-				"6. Logout.\n" <<
-				"7. Exit.\n" <<
+				"3. View History.\n" <<
+				"4. Make a Request.\n" <<
+				"5. View Request.\n" <<
+				"6. Edit Password.\n" <<
+				"7. Logout.\n" <<
+				"8. Exit.\n" <<
 				"Choice: ";
 
 			choice = getInt();
@@ -135,8 +136,14 @@ int main()
 				users[activeUser].makeTransaction(users, systemHistory);
 			}
 
+			//view history
+			if (choice == 3)
+			{
+				users[activeUser].viewHistory();
+			}
+
 			//Make a Request.
-			else if (choice == 3)
+			else if (choice == 4)
 			{
 				cout << "Enter user name that you want money form: ";
 				string receiver;
@@ -151,21 +158,21 @@ int main()
 				users[activeUser].requestTransaction(users);
 			}
 
+
+			//View request
+			else if (choice == 5)
+			{
+				users[activeUser].viewRequest(users, systemHistory);
+			}
+
 			//Eidt Password.
-			else if (choice == 4)
+			else if (choice == 6)
 			{
 				users[activeUser].editPassword();
 			}
-
-			//view history
-			if (choice == 5)
-			{
-				users[activeUser].viewHistory();
-			}
-
-
+			
 			//Logout.
-			else if (choice == 6)
+			else if (choice == 7)
 			{
 				activeUser = "";
 				inHome = false;
@@ -173,7 +180,7 @@ int main()
 			}
 
 			//Exit.
-			else if (choice == 7)
+			else if (choice == 8)
 			{
 				inHome = false;
 				runProgram = false;
@@ -191,15 +198,119 @@ int main()
 				cout << "Invalide choice!\n\n";
 			}
 		}
-	}
+		while (inAdmin)
+		{
+			int choice;
+			cout << "Hi " << activeUser << "\n\n" <<
+				"Enter the operation you want to select\n" <<
+				"1. View all users.\n" <<
+				"2. Add User.\n" <<
+				"3. Edit User.\n" <<
+				"4. Delete User.\n" <<
+				"5. Suspend User.\n" <<
+				"6. Activate User.\n" <<
+				"7. View System Transation History.\n" <<
+				"8. Adjust User's Balance.\n" <<
+				"9. Logout.\n" <<
+				"10. Exit.\n" <<
+				"Choice: ";
 
-	admin.ViewUniTransaction(systemHistory);
+			choice = getInt();
+
+			//View Users
+			if (choice == 1)
+			{
+				admin.viewUsersInfo(users);
+			}
+
+			//Add Users
+			else if (choice == 2)
+			{
+				admin.AddUser(users, 1000);
+			}
+
+			//Edit Users
+			else if (choice == 3)
+			{
+				string userName;
+				cin >> userName;
+
+				admin.EditUsersPassword(users, userName);
+			}
+
+			//Delete Users
+			else if (choice == 4)
+			{
+				string userName;
+				cin >> userName;
+
+				admin.DeleteUser(users, userName);
+			}
+
+			//Suspend Users
+			else if (choice == 5)
+			{
+				string userName;
+				cin >> userName;
+
+				admin.SuspendUser(users, userName);
+			}
+
+			//Activate Users
+			else if (choice == 6)
+			{
+				string userName;
+				cin >> userName;
+
+				admin.ReactivateUser(users, userName);
+			}
+
+			//view sys history
+			else if (choice == 7)
+			{
+				admin.ViewUniTransaction(systemHistory);
+			}
+
+			//Edit Users balance
+			else if (choice == 8)
+			{
+				admin.adjustBalance(users);
+			}
+
+			//logout
+			else if (choice == 9)
+			{
+				activeUser = "";
+				inAdmin = false;
+				inWelcome = true;
+			}
+			
+			//Eixt
+			else if (choice == 8)
+			{
+				inAdmin = false;
+				runProgram = false;
+			}
+
+			//word as input
+			else if (choice == -1)
+			{
+				cout << "invalid input!\nYou can not use words here!\n\n";
+			}
+
+			//else.
+			else
+			{
+				cout << "Invalide choice!\n\n";
+			}
+		}
+	}
 
 	saveUsers(users, fileName);
 	return 0;
 }
 
-void loadUsers(map<string, User>& users, string fileName)
+void loadUsers(unordered_map<string, User>& users, string fileName)
 {
 	ifstream data;
 
@@ -224,6 +335,7 @@ void loadUsers(map<string, User>& users, string fileName)
 
 	for (int userIndex = 0; userIndex < numUsers; userIndex++)
 	{
+		//user name and main data
 		getline(data, userKey, '|');
 		users[userKey].setUserName(userKey);
 
@@ -242,35 +354,40 @@ void loadUsers(map<string, User>& users, string fileName)
 
 		users[userKey].setBalance(userBalance);
 
+		//user history
 		int historySize;
 		data >> historySize;
 		data.ignore();
 
-		string sender, reciver;
+		string sender, reciver, date;
 		double amount;
 
 		for (int stackIndex = 0; stackIndex < historySize; stackIndex++)
 		{
 			getline(data, sender, '|');
-			getline(data, reciver);
+			getline(data, reciver, '|');
+			getline(data, date);
 			data >> amount;
 			data.ignore();
 
-			temp.push(Transaction(sender, reciver, amount));
+			temp.push(Transaction(sender, reciver, date, amount));
 		}
 
+		//requests part
 		int queueSize;
+		
 		data >> queueSize;
 		data.ignore();
 
 		for (int queueIndex = 0; queueIndex < queueSize; queueIndex++)
 		{
 			getline(data, sender, '|');
-			getline(data, reciver);
+			getline(data, reciver, '|');
+			getline(data, date);
 			data >> amount;
 			data.ignore();
 
-			users[userKey].addTransactionToQueue(Transaction(sender, reciver, amount));
+			users[userKey].addTransactionToQueue(Transaction(sender, reciver, date, amount));
 		}
 
 		for (int stackIndex = 0; stackIndex < temp.size(); stackIndex++)
@@ -286,7 +403,7 @@ void loadUsers(map<string, User>& users, string fileName)
 	cout << "Data has been loaded successfully";
 }
 
-void saveUsers(map<string, User>& users, string fileName)
+void saveUsers(unordered_map<string, User>& users, string fileName)
 {
 	ofstream data;
 
@@ -298,7 +415,7 @@ void saveUsers(map<string, User>& users, string fileName)
 		exit(1);
 	}
 
-	map<string, User>::iterator it;
+	unordered_map<string, User>::iterator it;
 
 
 	data << users.size() << endl;
@@ -320,7 +437,8 @@ void saveUsers(map<string, User>& users, string fileName)
 		for (int i = 0; i < historySize; i++)
 		{
 			data << it->second.getTransaction().top().Get_Sender() << '|' <<
-				it->second.getTransaction().top().Get_Reciver() << "\n" <<
+				it->second.getTransaction().top().Get_Reciver() << "|" <<
+				it->second.getTransaction().top().Get_date() << "\n" <<
 				it->second.getTransaction().top().Get_Amount() << "\n";
 		}
 
@@ -329,7 +447,8 @@ void saveUsers(map<string, User>& users, string fileName)
 		for (int i = 0; i < queueSize; i++)
 		{
 			data << it->second.getQueue().front().Get_Sender() << '|' <<
-				it->second.getQueue().front().Get_Reciver() << "\n" <<
+				it->second.getQueue().front().Get_Reciver() << "|" <<
+				it->second.getQueue().front().Get_date() << "\n" <<
 				it->second.getQueue().front().Get_Amount() << "\n";
 		}
 		data << '\n';

@@ -10,20 +10,21 @@ Admin::Admin()
 
 bool Admin::login(string Username, string Password)
 {
-    if (Username == "admin" && Password == "admin") {
+    if (Username == "Admin" && Password == "Admin") {
         return true;
     }
     else
         return false;
 }
 
-void Admin::AddUser(map<string, User>& users, double balance)
+void Admin::AddUser(unordered_map<string, User>& users, double balance)
 {
     while (true) 
     {
         string userName;
         cout << "Please enter user name\n\n";
         cin >> userName;
+        cin.ignore();
 
         if (users.find(userName) != users.end()) 
         {
@@ -67,22 +68,21 @@ void Admin::ViewUniTransaction(stack<Transaction> sysHistory)
     }
 
 }
-// edited part is removing current pass and new pass form the function atribute.
 
-//Note this code can be cleaner by applying the if(!true){return}
-
-void Admin::EditUsersPassword(map<string, User>& users, string userName) 
+void Admin::EditUsersPassword(unordered_map<string, User>& users, string userName) 
 {
     string currentPassword, newPassword;
-    map<string, User>::iterator it = users.find(userName);
+    unordered_map<string, User>::iterator it = users.find(userName);
     if (users.find(userName) != users.end()) 
     {
         cout << "Enter current password for user " << userName << ":\n";
         cin >> currentPassword;
+        cin.ignore();
         if (it->second.getPassword() == currentPassword)
         {
             cout << "Enter new password for user " << userName << ":\n";
             cin >> newPassword;
+            cin.ignore();
 
             it->second.setPassword(newPassword);
             cout << "Password for user " << userName << " has been updated.\n";
@@ -94,9 +94,9 @@ void Admin::EditUsersPassword(map<string, User>& users, string userName)
         cout << "User " << userName << " not found.\n";
 }
 
-void Admin::DeleteUser(map<string, User>& users, string userName)
+void Admin::DeleteUser(unordered_map<string, User>& users, string userName)
 {
-    map<string, User>::iterator it = users.find(userName);
+    unordered_map<string, User>::iterator it = users.find(userName);
     if (it != users.end()) 
     {
         users.erase(userName);
@@ -106,9 +106,9 @@ void Admin::DeleteUser(map<string, User>& users, string userName)
         cout << "User " << userName << " not found.\n";
 }
 
-void Admin::SuspendUser(map<string, User>& users, string userName)
+void Admin::SuspendUser(unordered_map<string, User>& users, string userName)
 {
-    map<string, User>::iterator it = users.find(userName);
+    unordered_map<string, User>::iterator it = users.find(userName);
     if (it != users.end()) 
     {
         it->second.setStatus(Suspend);
@@ -118,9 +118,9 @@ void Admin::SuspendUser(map<string, User>& users, string userName)
         cout << "User " << userName << " not found." << endl;
 }
 
-void Admin::ReactivateUser(map<string, User>& users, string userName)
+void Admin::ReactivateUser(unordered_map<string, User>& users, string userName)
 {
-    map<string, User>::iterator it = users.find(userName);
+    unordered_map<string, User>::iterator it = users.find(userName);
     if (it != users.end())
     {
         it->second.setStatus(Active);
@@ -130,10 +130,34 @@ void Admin::ReactivateUser(map<string, User>& users, string userName)
         cout << "User " << userName << " not found." << endl;
 }
 
-void Admin::viewUsersInfo(map<string, User>& users)
+void Admin::adjustBalance(unordered_map<string, User> users) 
+{
+    string username;
+    cout << "Enter username of the user: ";
+    cin >> username;
+    cin.ignore();
+
+    if (users.find(username) == users.end()) 
+    {
+        cout << "User not found try again" << endl;
+        return;
+    }
+
+    cout << "Enter the new amount of money after the making adjustion: ";
+    double newBalance;
+    cin >> newBalance;
+    cin.ignore();
+
+    if (newBalance < 0)
+        cout << "Error Balance can't be a negative value\n\n";
+
+    users[username].setBalance(newBalance);
+    cout << "User balance adjusted successfully." << endl;
+}
+void Admin::viewUsersInfo(unordered_map<string, User>& users)
 {
     int size = users.size();
-    map<string, User>::iterator it = users.begin();
+    unordered_map<string, User>::iterator it = users.begin();
     while (it != users.end())
     {
         cout << "User Name: " << it->first << endl;
