@@ -309,17 +309,18 @@ void User::editPassword()
 	string oldPassword, newPassword;
 
 	cout << "Enter your old password: \n";
-	cin >> oldPassword;
-	cin.ignore();
+
+	oldPassword = inputPassword();
+	oldPassword = passwordHashing(oldPassword);
 	int i = 2;
 
 	while (oldPassword != password && i > 0) {
 
 		cout << "Old password is incorrect.\nEnter password again : " << endl;
 
-		cin >> oldPassword;
-		cin.ignore();
+		oldPassword = inputPassword();
 
+		oldPassword = passwordHashing(oldPassword);
 
 		i--;
 
@@ -333,28 +334,61 @@ void User::editPassword()
 
 		return;
 	}
+	bool has_upper = false;//to check if the passowrd has atleast one uppercase
+	bool has_number = false;//to check if the passowrd has atleast one number
 
-	cout << "Enter a new password (at least 8 characters long): ";
-
-
-	do
+	while (true)
 	{
+		cout << "Now enter your password at least 8 letters and has at least 1 upper case letter and one number.\n";
+		cout << "Please enter you`re password: ";
+		newPassword = inputPassword();
 
+		if (newPassword.length() < 8 || newPassword.length() > 18)
+		{
+			cout << "Please make sure you`er password length at least 8 and at most 18 letters.\n\n";
+			continue;
+		}
+		//has upper case?
+		for (char pass : newPassword)
+		{
 
-		cin >> newPassword;
-		cin.ignore();
+			if (isupper(pass))
+			{
+				has_upper = true;
+				break;
+			}
 
+		}
+		//has number?
+		for (char Pass : newPassword)
+		{
 
-		if (newPassword.length() < 8)
+			if (isdigit(Pass))
+			{
+				has_number = true;
+				break;
+			}
+		}
 
-			cout << "Password must be at least 8 characters long try again." << endl;
+		//password checking after the loops
+		if (has_upper == true && has_number == true)
+		{
+			cout << "DONE!\n\n";
+			break;
+		}
+		if (has_upper != true)
+		{
+			cout << "Please make sure that you have atleast one uppercase letter\n\n";
+			continue;
+		}
+		if (has_number != true)
+		{
+			cout << "Please make sure that you have atleast one number\n\n";
+			continue;
+		}
+	}
 
-
-
-	} while (newPassword.length() < 8);
-
-
-	password = newPassword;
+	password = passwordHashing(newPassword);
 
 	cout << "Password updated successfully!" << endl;
 
