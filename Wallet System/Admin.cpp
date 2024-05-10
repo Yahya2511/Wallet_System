@@ -23,8 +23,7 @@ void Admin::AddUser(unordered_map<string, User>& users, double balance)
     {
         string userName;
         cout << "Please enter user name\n\n";
-        cin >> userName;
-        cin.ignore();
+        getline(cin, userName);
 
         if (users.find(userName) != users.end()) 
         {
@@ -134,8 +133,7 @@ void Admin::adjustBalance(unordered_map<string, User> users)
 {
     string username;
     cout << "Enter username of the user: ";
-    cin >> username;
-    cin.ignore();
+    getline(cin, username);
 
     if (users.find(username) == users.end()) 
     {
@@ -156,7 +154,7 @@ void Admin::adjustBalance(unordered_map<string, User> users)
 }
 void Admin::viewUsersInfo(unordered_map<string, User>& users)
 {
-    int size = users.size();
+    long long size = users.size();
     unordered_map<string, User>::iterator it = users.begin();
     while (it != users.end())
     {

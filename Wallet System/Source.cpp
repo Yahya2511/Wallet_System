@@ -12,13 +12,17 @@
 using namespace std;
 
 void loadUsers(unordered_map<string, User>& users, string fileName);
-
 void saveUsers(unordered_map<string, User>& users, string fileName);
+
+void loadSystemHistory(stack<Transaction>& systemHistory, string fileName);
+void saveSystemHistory(stack<Transaction>& systemHistory, string fileName);
+
 int getInt();
 
 int main()
 {
-	string fileName = "usersData.txt";
+	string usersFileName = "usersData.txt";
+	string systemHistoryFileName = "systemHistory.txt";
 
 	string activeUser = "";
 
@@ -28,13 +32,15 @@ int main()
 	bool inAdmin = false;
 
 	unordered_map<string, User> users;
-	unordered_map<string, User>::iterator it;
+
+	users["user1"] = User("user1", "pass1", 1000);
 
 	Admin admin;
 
 	stack<Transaction> systemHistory;
 
-	loadUsers(users, fileName);
+	loadUsers(users, usersFileName);
+	loadSystemHistory(systemHistory, systemHistoryFileName);
 
 	while (runProgram)
 	{
@@ -233,7 +239,8 @@ int main()
 			else if (choice == 3)
 			{
 				string userName;
-				cin >> userName;
+				cout << "Enter User name to edit him/her: ";
+				getline(cin, userName);
 
 				admin.EditUsersPassword(users, userName);
 			}
@@ -242,7 +249,8 @@ int main()
 			else if (choice == 4)
 			{
 				string userName;
-				cin >> userName;
+				cout << "Enter User name to Delete him/her: ";
+				getline(cin, userName);
 
 				admin.DeleteUser(users, userName);
 			}
@@ -251,7 +259,8 @@ int main()
 			else if (choice == 5)
 			{
 				string userName;
-				cin >> userName;
+				cout << "Enter User name to suspend him/her: ";
+				getline(cin, userName);
 
 				admin.SuspendUser(users, userName);
 			}
@@ -260,7 +269,8 @@ int main()
 			else if (choice == 6)
 			{
 				string userName;
-				cin >> userName;
+				cout << "Enter User name to activate him/her: ";
+				getline(cin, userName);
 
 				admin.ReactivateUser(users, userName);
 			}
@@ -286,7 +296,7 @@ int main()
 			}
 			
 			//Eixt
-			else if (choice == 8)
+			else if (choice == 10)
 			{
 				inAdmin = false;
 				runProgram = false;
@@ -306,7 +316,8 @@ int main()
 		}
 	}
 
-	saveUsers(users, fileName);
+	saveUsers(users, usersFileName);
+	saveSystemHistory(systemHistory, systemHistoryFileName);
 	return 0;
 }
 
@@ -322,57 +333,58 @@ void loadUsers(unordered_map<string, User>& users, string fileName)
 		exit(1);
 	}
 
-	int numUsers;
-	data >> numUsers;
-	data.ignore();
-
 	string userKey;
 	string userPass;
-	string userSatuts;
-	double userBalance;
+	string userStatus;
+	string strBalance;
+	double userBalance = 0;
 
 	stack<Transaction> temp;
-
-	for (int userIndex = 0; userIndex < numUsers; userIndex++)
+	
+	while (!data.eof())
 	{
-		//user name and main data
+		//username
 		getline(data, userKey, '|');
-		users[userKey].setUserName(userKey);
-
+		//Password
 		getline(data, userPass, '|');
-		users[userKey].setPassword(userPass);
 
-		getline(data, userSatuts);
-		if (userSatuts == "Active")
+		//Status
+		getline(data, userStatus, '|');
+		
+		getline(data, strBalance);
+
+		//Balance
+		userBalance = stod(strBalance);
+
+		users[userKey] = User(userKey, userPass, userBalance);
+
+		if (userStatus == "Active")
 			users[userKey].setStatus(Status::Active);
 		else
 			users[userKey].setStatus(Status::Suspend);
 
-
-		data >> userBalance;
-		data.ignore();
-
-		users[userKey].setBalance(userBalance);
 
 		//user history
 		int historySize;
 		data >> historySize;
 		data.ignore();
 
-		string sender, reciver, date;
+		string sender, reciver, date, strAmount;
 		double amount;
 
 		for (int stackIndex = 0; stackIndex < historySize; stackIndex++)
 		{
 			getline(data, sender, '|');
 			getline(data, reciver, '|');
-			getline(data, date);
-			data >> amount;
-			data.ignore();
+			getline(data, date, '|');
+			getline(data, strAmount);
+			
+			amount = stod(strAmount);
 
 			temp.push(Transaction(sender, reciver, date, amount));
 		}
 
+		
 		//requests part
 		int queueSize;
 		
@@ -383,26 +395,25 @@ void loadUsers(unordered_map<string, User>& users, string fileName)
 		{
 			getline(data, sender, '|');
 			getline(data, reciver, '|');
-			getline(data, date);
-			data >> amount;
-			data.ignore();
+			getline(data, date, '|');
+			getline(data, strAmount);
+
+			amount = stod(strAmount);
 
 			users[userKey].addTransactionToQueue(Transaction(sender, reciver, date, amount));
 		}
 
-		for (int stackIndex = 0; stackIndex < temp.size(); stackIndex++)
+		while (!temp.empty())
 		{
 			users[userKey].addTransactionToStack(temp.top());
 			temp.pop();
 		}
-		data.ignore();
 	}
 
 	data.close();
 
-	cout << "Data has been loaded successfully";
+	cout << "Users data has been loaded successfully\n";
 }
-
 void saveUsers(unordered_map<string, User>& users, string fileName)
 {
 	ofstream data;
@@ -417,18 +428,15 @@ void saveUsers(unordered_map<string, User>& users, string fileName)
 
 	unordered_map<string, User>::iterator it;
 
-
-	data << users.size() << endl;
-
 	for (it = users.begin(); it != users.end(); it++)
 	{
 		data << it->second.getUserName() << '|' <<
 			it->second.getPassword() << '|';
 
 		if (it->second.getStatus() == Status::Active)
-			data << "Active\n";
+			data << "Active|";
 		else
-			data << "Suspend\n";
+			data << "Suspend|";
 
 		data << it->second.getBalance() << '\n';
 
@@ -438,7 +446,7 @@ void saveUsers(unordered_map<string, User>& users, string fileName)
 		{
 			data << it->second.getTransaction().top().Get_Sender() << '|' <<
 				it->second.getTransaction().top().Get_Reciver() << "|" <<
-				it->second.getTransaction().top().Get_date() << "\n" <<
+				it->second.getTransaction().top().Get_date() << "|" <<
 				it->second.getTransaction().top().Get_Amount() << "\n";
 		}
 
@@ -448,14 +456,88 @@ void saveUsers(unordered_map<string, User>& users, string fileName)
 		{
 			data << it->second.getQueue().front().Get_Sender() << '|' <<
 				it->second.getQueue().front().Get_Reciver() << "|" <<
-				it->second.getQueue().front().Get_date() << "\n" <<
-				it->second.getQueue().front().Get_Amount() << "\n";
+				it->second.getQueue().front().Get_date() << "|" <<
+				it->second.getQueue().front().Get_Amount();
+
+			it++;
+			if (it != users.end())
+			{
+				data << "\n";
+				cout << 1;
+			}
+			it--;
 		}
-		data << '\n';
 	}
 
 	data.close();
 
+}
+
+void loadSystemHistory(stack<Transaction>& systemHistory, string fileName)
+{
+	ifstream data;
+
+	data.open(fileName);
+
+	if (data.fail())
+	{
+		cout << "Error opening file!!!!" << endl;
+		exit(1);
+	}
+
+	stack<Transaction> temp;
+
+	string sender, reciver, date, strAmount;
+	double amount;
+
+	while (!data.eof())
+	{
+		getline(data, sender, '|');
+		getline(data, reciver, '|');
+		getline(data, date, '|');
+		getline(data, strAmount);
+
+		amount = stod(strAmount);
+
+		temp.push(Transaction(sender, reciver, date, amount));
+	}
+
+	while (!temp.empty())
+	{
+		systemHistory.push(temp.top());
+		temp.pop();
+	}
+
+	data.close();
+
+	cout << "System data has been loaded successfully\n";
+
+}
+void saveSystemHistory(stack<Transaction>& systemHistory, string fileName)
+{
+	ofstream data;
+
+	data.open(fileName);
+
+	if (data.fail())
+	{
+		cout << "Error opening file!!!!" << endl;
+		exit(1);
+	}
+
+	long long size = systemHistory.size();
+	for (long long  historyIndex = 0; historyIndex < size; historyIndex++)
+	{
+		data << systemHistory.top().Get_Sender() << "|"
+			<< systemHistory.top().Get_Reciver() << "|"
+			<< systemHistory.top().Get_date() << "|"
+			<< systemHistory.top().Get_Amount();
+
+		if (historyIndex != size - 1)
+		{
+			data << '\n';
+		}
+	}
 }
 
 int getInt()

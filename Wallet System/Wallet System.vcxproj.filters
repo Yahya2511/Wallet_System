@@ -43,5 +43,8 @@
     <Text Include="usersData.txt">
       <Filter>Resource Files</Filter>
     </Text>
+    <Text Include="systemHistory.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

@@ -31,10 +31,10 @@ void User::userRegister(unordered_map<string, User>& users)
 	while (true)
 	{
 		cout << "Please enter user name\n\n";
-		cin >> Username;
-		cin.ignore();
+		getline(cin, Username);
 
-		if (users.find(Username) != users.end()) {
+		if (users.find(Username) != users.end()) 
+		{
 			cout << "Sorry this user name is already exist!\n\n";
 			continue;
 		}
@@ -87,8 +87,7 @@ string User::login(unordered_map<string, User>& users)
 {
 	string userName;
 	cout << "Enter user name: ";
-	cin >> userName;
-	cin.ignore();
+	getline(cin, userName);
 
 	string pass;
 	cout << "Enter password: ";
