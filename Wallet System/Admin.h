@@ -9,13 +9,13 @@ using namespace std;
 
 class Admin
 {
-    string adminName;
-    int adminId;
+    string adminName = "Admin";
+    string password;
 
 public:
     Admin();
 
-    bool static login(string, string);
+    bool login(string, string);
 
     void AddUser(unordered_map<string, class User>& usersMap, double initialBalance);
     void EditUsersPassword(unordered_map<string, class User>& users, string userName);
@@ -27,4 +27,8 @@ public:
   
     void adjustBalance(unordered_map<string, class User>);
     void viewUsersInfo(unordered_map<string, class User>& users);
+
+    void passwordHashing();
+
+    void passwordHashing(string& pass);
 };

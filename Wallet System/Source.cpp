@@ -59,7 +59,7 @@ int main()
 			//Login.
 			if (choice == 1)
 			{
-				string checkUserName = User::login(users);
+				string checkUserName = User::login(users, admin );
 				if (checkUserName != "")
 				{
 					if (checkUserName == "Admin")
@@ -174,7 +174,7 @@ int main()
 			//Eidt Password.
 			else if (choice == 6)
 			{
-				users[activeUser].editPassword();
+				users[activeUser].editPassword(users);
 			}
 			
 			//Logout.

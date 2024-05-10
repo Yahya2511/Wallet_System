@@ -4,6 +4,8 @@
 #include <stack>
 #include <unordered_map>
 #include <queue>
+#include <conio.h>
+#include <string>
 #include "Transaction.h"
 
 using namespace std;
@@ -31,7 +33,7 @@ public:
 	User(string, string, double);
 
 	void static userRegister(unordered_map<string, User>&);
-	string static login(unordered_map<string, User>& users);
+	string static login(unordered_map<string, User>& users, class Admin admin);
 
 	//make a transactoin
 	void makeTransaction(unordered_map<string, User>& users, stack<Transaction>& sysHistory);
@@ -41,12 +43,12 @@ public:
 	void viewHistory();
 
 	//requests
-	bool requestTransaction(unordered_map<string, User>& users);
+	void requestTransaction(unordered_map<string, User>& users);
 	void addRequest(unordered_map<string, User>& users, string request_reciever, double amount);
 	void viewRequest(unordered_map<string, User>& users, stack<Transaction>& sysHistory);
 
 	//edit password
-	int editPassword();
+	void editPassword();
 	void displayUserInfo();
 
 	//getters and setters
@@ -68,6 +70,12 @@ public:
 	void addTransactionToQueue(Transaction t);
 
 	queue<Transaction>& getQueue();
+
+	//password hashing
+	string static inputPassword(void);
+	void static passwordHashingForRegister(unordered_map<string, User>& users, string userName, string pass);
+	string passwordHashing(string pass);
+	bool static checkPassword(unordered_map<string, User>& users, string userName);
 
 	//dest.
 	~User();

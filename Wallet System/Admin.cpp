@@ -4,17 +4,21 @@
 
 Admin::Admin()
 {
-	adminName = "Admin";
-	adminId = 1;
+    passwordHashing();
 }
 
-bool Admin::login(string Username, string Password)
+bool Admin::login(string Username, string pass)
 {
-    if (Username == "Admin" && Password == "Admin") {
+    passwordHashing(pass);
+
+    if (Username == adminName && pass == password)
+    {
         return true;
     }
     else
+    {
         return false;
+    }
 }
 
 void Admin::AddUser(unordered_map<string, User>& users, double balance)
@@ -164,4 +168,18 @@ void Admin::viewUsersInfo(unordered_map<string, User>& users)
         it->second.viewHistory();
         it++;
     }
+}
+
+void Admin::passwordHashing()
+{
+    hash<string>hashing;
+    long long x = hashing("Admin");
+    password = to_string(x);
+}
+
+void Admin::passwordHashing(string& pass)
+{
+    hash<string>hashing;
+    long long x = hashing(pass);
+    pass = to_string(x);
 }

@@ -21,12 +21,13 @@ User::User(string name, string pass, double bal)
 //Login and register
 void User::userRegister(unordered_map<string, User>& users)
 {
-
 	string Username;
 	string Password;
+
 	bool has_upper = false;//to check if the passowrd has atleast one uppercase
 	bool has_number = false;//to check if the passowrd has atleast one number
-	cout << "Hi! Let`s get started \n\n";
+
+	cout << "Hi! Let`s get started: ";
 
 	while (true)
 	{
@@ -40,70 +41,83 @@ void User::userRegister(unordered_map<string, User>& users)
 		}
 		else break;
 	}
+
 	while (true)
 	{
-		cout << "Please enter you`re password \n\n";
-		cin >> Password;
-		cin.ignore();
+		cout << "Now enter your password at least 8 letters and has at least 1 upper case letter and one number.\n";
+		cout << "Please enter you`re password: ";
+		Password = inputPassword();
 
-		if (Password.length() < 8) {
-			cout << "Please make sure you`er password length atleast 8 letters\n\n";
+		if (Password.length() < 8 || Password.length() > 18)
+		{
+			cout << "Please make sure you`er password length at least 8 and at most 18 letters.\n\n";
 			continue;
 		}
-		for (char pass : Password) {
+		//has upper case?
+		for (char pass : Password) 
+		{
 
-			if (isupper(pass)) {
+			if (isupper(pass)) 
+			{
 				has_upper = true;
 				break;
 			}
 
 		}
-		for (char Pass : Password) {
+		//has number?
+		for (char Pass : Password) 
+		{
 
-			if (isdigit(Pass)) {
+			if (isdigit(Pass)) 
+			{
 				has_number = true;
 				break;
 			}
 		}
 
-		if (has_upper == true && has_number == true) {
+		//password checking after the loops
+		if (has_upper == true && has_number == true) 
+		{
 			cout << "DONE!\n\n";
 			break;
 		}
-		if (has_upper != true) {
+		if (has_upper != true) 
+		{
 			cout << "Please make sure that you have atleast one uppercase letter\n\n";
 			continue;
 		}
-		if (has_number != true) {
+		if (has_number != true) 
+		{
 			cout << "Please make sure that you have atleast one number\n\n";
 			continue;
 		}
-
 	}
+	passwordHashingForRegister(users, Username, Password);
 	users[Username] = User(Username, Password, 1000);
 
 }
-string User::login(unordered_map<string, User>& users)
+string User::login(unordered_map<string, User>& users, Admin admin)
 {
 	string userName;
+	string pass;
 	cout << "Enter user name: ";
 	getline(cin, userName);
-
-	string pass;
-	cout << "Enter password: ";
-	cin >> pass;
-	cin.ignore();
-
-	if (Admin::login(userName, pass) == true)
-	{
-		return userName;
-	}
 
 	if (users.find(userName) == users.end())
 	{
 		cout << "Can not login!\nReason: User not found.\n\n";
 		return "";
 	}
+
+	cout << "Enter password: ";
+	pass = inputPassword();
+
+	if (admin.login(userName, pass))
+	{
+		return userName;
+	}
+
+	passwordHashingForRegister(users, userName, pass);
 
 	if (users[userName].getPassword() != pass)
 	{
@@ -218,12 +232,12 @@ void User::viewHistory()
 }
 
 //requests
-bool User::requestTransaction(unordered_map<string, User>& users)
+void User::requestTransaction(unordered_map<string, User>& users)
 {
 	if (status == Status::Suspend)
 	{
 		cout << "Can not make transaction!\nReason: Account is suspended\n\n";
-		return false;
+		return;
 	}
 	string requestReceiver;
 	cout << "Enter the name of the user you want to request transaction from : ";
@@ -233,12 +247,12 @@ bool User::requestTransaction(unordered_map<string, User>& users)
 	if (users.find(requestReceiver) == users.end())
 	{
 		cout << "Can not make transaction!\nReason: Sender not found\n\n";
-		return false;
+		return;
 	}
 	if (users[requestReceiver].getStatus() == Suspend)
 	{
 		cout << "Can not make transaction!\nReason: Sender is suspended\n\n";
-		return false;
+		return;
 	}
 	cout << "Enter the amount of money you want to request: ";
 	double amount;
@@ -290,16 +304,14 @@ void User::viewRequest(unordered_map<string, User>& users, stack<Transaction>& s
 }
 
 //edit password
-int User::editPassword() {
-
+void User::editPassword()
+{
 	string oldPassword, newPassword;
 
-	cout << "Enter your old password: \n"; 
+	cout << "Enter your old password: \n";
 	cin >> oldPassword;
 	cin.ignore();
-
 	int i = 2;
-
 
 	while (oldPassword != password && i > 0) {
 
@@ -319,13 +331,13 @@ int User::editPassword() {
 
 		cout << "You have been reached maxium attempets." << endl;
 
-		return 0;
+		return;
 	}
 
 	cout << "Enter a new password (at least 8 characters long): ";
 
 
-	do 
+	do
 	{
 
 
@@ -412,6 +424,106 @@ void User::addTransactionToQueue(Transaction t)
 queue<Transaction>& User::getQueue()
 {
 	return transactionQueue;
+}
+
+// Password Hashing
+string User::inputPassword(void)
+{
+	char inputPassword[20];
+	char c;
+	int i = 0;
+	while (true)
+	{
+		c = _getch();
+		if (c == '\r')
+		{
+			break;
+		}
+		if (c != '\b')
+		{
+			inputPassword[i] = c;
+			cout << '*';
+			i++;
+		}
+		else
+		{
+			i--;
+			if (i < 0)
+			{
+				i++;
+			}
+			else
+			{
+				cout << "\b \b";
+			}
+		}
+	}
+	inputPassword[i] = '\0';
+	string pass = inputPassword;
+	return pass;
+}
+bool User::checkPassword(unordered_map<string, User>& users, string userName)
+{
+	char inputPassword[20];
+	char c;
+	int i = 0;
+	while (true)
+	{
+		c = _getch();
+		if (c == '\r')
+		{
+			break;
+		}
+		if (c != '\b')
+		{
+			inputPassword[i] = c;
+			cout << '*';
+			i++;
+		}
+		else
+		{
+			i--;
+			if (i < 0)
+			{
+				i++;
+			}
+			else
+			{
+				cout << "\b \b";
+			}
+		}
+	}
+	inputPassword[i] = '\0';
+
+	string passw = inputPassword;
+	hash<string>hashing;
+
+	long long temp = hashing(passw);
+
+	string check = to_string(temp);
+
+	if (users[userName].getPassword() == check)
+	{
+		return true;
+	}
+
+	else
+	{
+		return false;
+	}
+}
+
+void User::passwordHashingForRegister(unordered_map<string, User>& users, string userName, string pass)
+{
+	hash<string>hashing;
+	long long x = hashing(pass);
+	users[userName].setPassword(to_string(x));
+}
+string User::passwordHashing(string pass)
+{
+	hash<string>hashing;
+	long long x = hashing(pass);
+	return to_string(x);
 }
 
 //dest.
