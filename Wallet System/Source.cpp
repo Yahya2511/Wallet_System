@@ -174,7 +174,7 @@ int main()
 			//Eidt Password.
 			else if (choice == 6)
 			{
-				users[activeUser].editPassword(users);
+				users[activeUser].editPassword();
 			}
 			
 			//Logout.
