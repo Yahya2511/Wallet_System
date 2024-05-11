@@ -172,7 +172,7 @@ string User::login(unordered_map<string, User>& users, Admin admin)
 			{
 				string enteredCode, password, confirmPassword;
 				string mail = users[userName].getGmail();
-				string randomCode = User::gen_random();
+				string randomCode = User::gen_random();//get the random code from the function
 				fstream file;
 
 				file.open("ForgetPassword.ps1", ios::in | ios::out);
@@ -187,7 +187,7 @@ string User::login(unordered_map<string, User>& users, Admin admin)
 				string content = "";
 				int lineNumber = 1;
 
-				while (getline(file, line))
+				while (getline(file, line))//line will go through the file
 				{
 					if (lineNumber == 4)
 					{
@@ -217,10 +217,13 @@ string User::login(unordered_map<string, User>& users, Admin admin)
 
 				file.open("ForgetPassword.ps1", ios::in);
 
-				while (getline(file, line)) {
-					if (lineNumber == 4) {
+				while (getline(file, line))// it will remove the mail and the random code after execute the powershell code
+				{
+					if (lineNumber == 4)
+					{
 						pos = line.find(mail + "\"");
-						if (pos != string::npos) {
+						if (pos != string::npos)
+						{
 							line.erase(pos, mail.size() + 1);//erase mail plus "
 						}
 					}
@@ -236,7 +239,7 @@ string User::login(unordered_map<string, User>& users, Admin admin)
 				}
 				file.close();
 				file.open("ForgetPassword.ps1", ios::out);
-				file << newContent;
+				file << newContent;// the modified clean powershell code
 				file.close();
 				cout << "enter the 6-digit code or enter \"1\" to exit\n";
 				cin >> enteredCode;
