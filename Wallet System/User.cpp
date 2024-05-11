@@ -170,9 +170,9 @@ string User::login(unordered_map<string, User>& users, Admin admin)
 			}
 			else if (choice == 2)
 			{
-				string randomCode, enteredCode, password, confirmPassword;
+				string enteredCode, password, confirmPassword;
 				string mail = users[userName].getGmail();
-				randomCode = User::gen_random();
+				string randomCode = User::gen_random();
 				fstream file;
 
 				file.open("ForgetPassword.ps1", ios::in | ios::out);
@@ -180,7 +180,7 @@ string User::login(unordered_map<string, User>& users, Admin admin)
 				if (file.fail())
 				{
 					cout << "Error in opening file";
-					exit(1);
+					return "";
 				}
 
 				string line;
@@ -221,7 +221,7 @@ string User::login(unordered_map<string, User>& users, Admin admin)
 					if (lineNumber == 4) {
 						pos = line.find(mail + "\"");
 						if (pos != string::npos) {
-							line.erase(pos, mail.size() + 1);
+							line.erase(pos, mail.size() + 1);//erase mail plus "
 						}
 					}
 					if (lineNumber == 6) {
@@ -230,7 +230,7 @@ string User::login(unordered_map<string, User>& users, Admin admin)
 							line.erase(pos, randomCode.size() + 1);
 						}
 					}
-					newContent += line + "\n";
+					newContent += line + "\n";//so it wont delete if nothing entered
 
 					lineNumber++;
 				}
@@ -241,24 +241,29 @@ string User::login(unordered_map<string, User>& users, Admin admin)
 				cout << "enter the 6-digit code or enter \"1\" to exit\n";
 				cin >> enteredCode;
 				while (true) {
-					if (enteredCode == randomCode) {
+					if (enteredCode == randomCode)
+					{
 						cout << "\nenter password\n";
 						cin >> password;
 						cout << "\nenter password again\n";
 						cin >> confirmPassword;
-						if (password == confirmPassword) {
+						if (password == confirmPassword)
+						{
 							users[userName].password = password;
 							cout << "\npassword changed\n\n";
 							break;
 						}
-						else {
+						else
+						{
 							cout << "\npasswords do not match\n";
 						}
 					}
-					else if (enteredCode == "1") {
+					else if (enteredCode == "1")
+					{
 						break;
 					}
-					else {
+					else
+					{
 						cout << "code does'nt match\n\nplease enter the 6-digit code again\n";
 						cin >> enteredCode;
 					}
