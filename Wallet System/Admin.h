@@ -1,22 +1,34 @@
 #pragma once
-#include<iostream>
-#include<vector>
-using namespace std;
+#include <iostream>
+#include <vector>
 #include <string>
-#include "User.h"
+#include <stack>
+#include <unordered_map>
+
+using namespace std;
+
 class Admin
 {
-private:
-	string adminName;
-	int adminId;
-	map<string, User> users;
-	Status status;
-public:
-	Admin();
-	void AddUser(double);
-	void EditusersPassword(string& userName, string& currentpassword, string& newPassword);
-	void DeleteUser(string& userName);
-	void SuspendUser(string& userName);
-	void ReactivateUser(string& userName);
-};
+    string adminName = "Admin";
+    string password;
 
+public:
+    Admin();
+
+    bool login(string, string);
+
+    void AddUser(unordered_map<string, class User>& usersMap, double initialBalance);
+    void EditUsersPassword(unordered_map<string, class User>& users, string userName);
+    void DeleteUser(unordered_map<string, class User>& usersMap, string userName);
+    void SuspendUser(unordered_map<string, class User>& usersMap, string userName);
+    void ReactivateUser(unordered_map<string, class User>& usersMap, string userName);
+
+    void ViewUniTransaction(stack<class Transaction> sysHistory);
+  
+    void adjustBalance(unordered_map<string, class User>);
+    void viewUsersInfo(unordered_map<string, class User>& users);
+
+    void passwordHashing();
+
+    void passwordHashing(string& pass);
+};

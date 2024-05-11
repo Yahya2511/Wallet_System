@@ -1,10 +1,15 @@
 #pragma once
 #include <iostream>
-#include "Transaction.h"
 #include <vector>
 #include <stack>
-#include <map>
-#include<queue>
+#include <unordered_map>
+#include <queue>
+#include <conio.h>
+#include <string>
+#include <ctime> 
+#include <cstdlib>
+#include <fstream>
+#include "Transaction.h"
 
 using namespace std;
 
@@ -19,35 +24,38 @@ class User
 	//variables
 	string userName;
 	string password;
+	string gmail;
 	double balance = 0;
 	Status status;
 
 	stack <Transaction> historyOfTransaction;
-	queue<Transaction> transactionQueue;
+	queue <Transaction> transactionQueue;
 
 	//methodes
 public:
 	User();
 	User(string, string, double);
+	User(string, string, double, string);
 
-	void static userRegister(map<string, User>&);
-	string static login(map<string, User>& users);
+	void viewBalance();
+
+	void static userRegister(unordered_map<string, User>&);
+	string static login(unordered_map<string, User>& users, class Admin admin);
 
 	//make a transactoin
-	void makeTransaction(map<string, User>& users);
+	void makeTransaction(unordered_map<string, User>& users, stack<Transaction>& sysHistory);
 
 	//transactions history
-	void addToHistory(map<string, User>& users, string userName, double balance);
+	void addToHistory(unordered_map<string, User>& users, stack<Transaction>& sysHistory, string userName, double balance);
 	void viewHistory();
 
 	//requests
-	bool requestTransaction(map<string, User>& users, string sender, double amount);
-	void addRequest(map<string, User>& users, string request_reciever, double amount);
-	void viewRequets(map<string, User>& users);
+	void requestTransaction(unordered_map<string, User>& users);
+	void addRequest(unordered_map<string, User>& users, string request_reciever, double amount);
+	void viewRequest(unordered_map<string, User>& users, stack<Transaction>& sysHistory);
 
 	//edit password
-	int editPassword();
-	void displayUserInfo();
+	void editPassword();
 
 	//getters and setters
 	string getUserName();
@@ -68,6 +76,15 @@ public:
 	void addTransactionToQueue(Transaction t);
 
 	queue<Transaction>& getQueue();
+
+	//password hashing
+	string static inputPassword(void);
+	string static passwordHashing(string pass);
+	bool static checkPassword(unordered_map<string, User>& users, string userName);
+
+	//for forget password
+	static string gen_random();
+	string getGmail();
 
 	//dest.
 	~User();

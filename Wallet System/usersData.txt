@@ -1,22 +1,30 @@
-3
-user1|pass1|Active
-500
-1
-user1|user2
-500
+user1|pass1|Active|1000
 0
-
-user2|pass2|Active
-1500
-1
-user1|user2
-500
 0
-
-user3|pass3|Active
-1000
-1
-user3|user1
-200
+New User|-4858578123907309161|Active|1000
 0
-
+0
+user2|pass2|Active|1900
+2
+Yahya Hamza|user2|Sat May 11 16:56:51 2024|200
+Yahya Hamza|user2|Sat May 11 16:56:51 2024|200
+2
+user2|user1|Sun, May, 5. 2024|500
+user2|user1|Sun, May, 5. 2024|500
+user3|pass3|Active|1000
+0
+1
+user2|user3|Sun, May, 5. 2024|200
+Yahya Hamza|4074800294911123512|Active|300
+2
+Yahya Hamza|Mo Tarek|Sat May 11 21:15:39 2024|500
+Yahya Hamza|Mo Tarek|Sat May 11 21:15:39 2024|500
+1
+Yahya Hamza|Mo Tarek|Sat May 11 21:16:12 2024|200
+Eren Yeager|-4858578123907309161|Active|1000
+0
+0
+Mo Tarek|-4858578123907309161|Active|1500
+1
+Yahya Hamza|Mo Tarek|Sat May 11 21:15:39 2024|500
+0
