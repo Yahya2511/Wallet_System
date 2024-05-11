@@ -80,11 +80,13 @@ public:
 	//password hashing
 	string static inputPassword(void);
 	string static passwordHashing(string pass);
-	bool static checkPassword(unordered_map<string, User>& users, string userName);
+	bool static checkPassword(string);
 
 	//for forget password
 	static string gen_random();
 	string getGmail();
+
+	int static getIntger();
 
 	//dest.
 	~User();

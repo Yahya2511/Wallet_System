@@ -30,7 +30,7 @@ User::User(string name, string pass, double bal, string mail)
 void User::viewBalance()
 {
 	cout << "Enter your password: ";
-	string pass = inputPassword();
+	string pass = User::inputPassword();
 
 	pass = passwordHashing(pass);
 
@@ -44,87 +44,85 @@ void User::viewBalance()
 //Login and register
 void User::userRegister(unordered_map<string, User>& users)
 {
+	string reggmail;
 	string Username;
 	string Password;
 
-	bool has_upper = false;//to check if the passowrd has atleast one uppercase
-	bool has_number = false;//to check if the passowrd has atleast one number
+	bool has_upper = false;
+	bool has_number = false;
 
 	cout << "Hi! Let`s get started: ";
 
+	//user name check
 	while (true)
 	{
 		cout << "Please enter user name\n\n";
 		getline(cin, Username);
 
-		if (users.find(Username) != users.end()) 
+		if (users.find(Username) != users.end())
 		{
 			cout << "Sorry this user name is already exist!\n\n";
 			continue;
 		}
-		else break;
-	}
-
-	while (true)
-	{
-		cout << "Now enter your password at least 8 letters and has at least 1 upper case letter and one number.\n";
-		cout << "Please enter you`re password: ";
-		Password = inputPassword();
-
-		if (Password.length() < 8 || Password.length() > 18)
+		else if (Username.length() < 4 || Username.length() > 15)
 		{
-			cout << "Please make sure you`er password length at least 8 and at most 18 letters.\n\n";
+			cout << "Error, user name should between 4 and 15 characters.\n";
 			continue;
 		}
-		//has upper case?
-		for (char pass : Password) 
+		bool has_alpha = false;
+		for (char name : Username)
 		{
-
-			if (isupper(pass)) 
+			if (isalpha(name))
 			{
-				has_upper = true;
-				break;
-			}
-
-		}
-		//has number?
-		for (char Pass : Password) 
-		{
-
-			if (isdigit(Pass)) 
-			{
-				has_number = true;
+				has_alpha = true;
 				break;
 			}
 		}
-
-		//password checking after the loops
-		if (has_upper == true && has_number == true) 
+		if (!has_alpha)
 		{
-			cout << "\nYour Account is created. \n\n";
+			cout << "User name must have at least one character";
+			continue;
+		}
+		else
+		{
 			break;
 		}
-		if (has_upper != true) 
-		{
-			cout << "\nPlease make sure that you have atleast one uppercase letter.\n\n";
-			continue;
-		}
-		if (has_number != true) 
-		{
-			cout << "\nPlease make sure that you have atleast one number\n\n";
-			continue;
-		}
 	}
+
+
+	bool doneCheck = false;
+	//password check
+	while (!doneCheck)
+	{
+		cout << "Enter password: ";
+		Password = User::inputPassword();
+		doneCheck = checkPassword(Password);
+	}
+	
+	//password hashing
 	Password = passwordHashing(Password);
 
+	//gmail check
+	while (true)
+	{
+		cout << "Enter your gmail please " << endl;
+		cin >> reggmail;
+		cin.ignore();
+		if (reggmail.find("@gmail.com") == string::npos) //npos is number that return if value isnt found
+		{
+			cout << "Please enter a @gmail.com right " << endl;
+			continue;
+		}
+		else
+		{
+			break;
+		}
+	}
 
-	string reggmail;
-	cout << "enter your gmail please " << endl;
-	cin >> reggmail;
-	cin.ignore();
+	cout << "\nYour Account is created. \n\n";
 	users[Username] = User(Username, Password, 1000, reggmail);
 
-	users[Username] = User(Username, Password, 1000);
+	//users[Username] = User(Username, Password, 1000);
 
 }
 string User::login(unordered_map<string, User>& users, Admin admin)
@@ -145,41 +143,42 @@ string User::login(unordered_map<string, User>& users, Admin admin)
 	while (true)
 	{
 		cout << "Enter password: ";
-		pass = inputPassword();
+		pass = User::inputPassword();
 
 		if (count >= 2)
 		{
 			int choice = 0;
 			cout << "\nif you want to exit enter 1 or enter 2 to change your password" << endl;
-			cin >> choice;
+			choice = getIntger();
 			if (choice == 1)
 			{
 				return "";
 			}
 			else if (choice == 2)
 			{
-				string randomCode, enteredCode, password, confirmPassword;
+				string enteredCode, password, confirmPassword;
 				string mail = users[userName].getGmail();
-				randomCode = User::gen_random();
+				string randomCode = User::gen_random();//get the random code from the function
 				fstream file;
 
-				file.open("C:\\Users\\Lenovo\\Documents\\ForgetPassword.ps1", ios::in | ios::out);
+				file.open("ForgetPassword.ps1", ios::in | ios::out);
 
 				if (file.fail())
 				{
 					cout << "Error in opening file";
-					exit(1);
+					return "";
 				}
 
 				string line;
 				string content = "";
 				int lineNumber = 1;
 
-				while (getline(file, line))
+				while (getline(file, line))//line will go through the file
 				{
 					if (lineNumber == 4)
 					{
 						line += mail + "\"";
+
 					}
 
 					if (lineNumber == 6)
@@ -196,56 +195,75 @@ string User::login(unordered_map<string, User>& users, Admin admin)
 				file << content;
 				file.close();
 
-				system("powershell -ExecutionPolicy Bypass -File C:\\Users\\Lenovo\\Documents\\ForgetPassword.ps1");
+				system("powershell -ExecutionPolicy Bypass -File ForgetPassword.ps1");
 
 				string newContent = "";
 				string::size_type pos;
 				lineNumber = 1;
 
-				file.open("C:\\Users\\Lenovo\\Documents\\ForgetPassword.ps1", ios::in);
+				file.open("ForgetPassword.ps1", ios::in);
 
-				while (getline(file, line)) {
-					if (lineNumber == 4) {
+				while (getline(file, line))// it will remove the mail and the random code after execute the powershell code
+				{
+					if (lineNumber == 4)
+					{
 						pos = line.find(mail + "\"");
-						if (pos != string::npos) {
-							line.erase(pos, mail.size() + 1);
+						if (pos != string::npos)
+						{
+							line.erase(pos, mail.size() + 1);//erase mail plus "
 						}
 					}
-					if (lineNumber == 6) {
+					if (lineNumber == 6) 
+					{
 						pos = line.find(randomCode + "\"");
 						if (pos != string::npos) {
 							line.erase(pos, randomCode.size() + 1);
 						}
 					}
-					newContent += line + "\n";
+					newContent += line + "\n";//so it wont delete if nothing entered
 
 					lineNumber++;
 				}
 				file.close();
-				file.open("C:\\Users\\Lenovo\\Documents\\ForgetPassword.ps1", ios::out);
-				file << newContent;
+				file.open("ForgetPassword.ps1", ios::out);
+				file << newContent;// the modified clean powershell code
 				file.close();
 				cout << "enter the 6-digit code or enter \"1\" to exit\n";
 				cin >> enteredCode;
-				while (true) {
-					if (enteredCode == randomCode) {
+				cin.ignore();
+				while (true) 
+				{
+					if (enteredCode == randomCode)
+					{
 						cout << "\nenter password\n";
-						cin >> password;
+						password = User::inputPassword();
+
+						if (!User::checkPassword(password))
+						{
+							continue;
+						}
+
 						cout << "\nenter password again\n";
-						cin >> confirmPassword;
-						if (password == confirmPassword) {
-							users[userName].password = password;
+						confirmPassword = User::inputPassword();
+
+						if (password == confirmPassword)
+						{
+							
+							users[userName].password = passwordHashing(password);
 							cout << "\npassword changed\n\n";
 							break;
 						}
-						else {
+						else
+						{
 							cout << "\npasswords do not match\n";
 						}
 					}
-					else if (enteredCode == "1") {
+					else if (enteredCode == "1")
+					{
 						break;
 					}
-					else {
+					else
+					{
 						cout << "code does'nt match\n\nplease enter the 6-digit code again\n";
 						cin >> enteredCode;
 					}
@@ -272,7 +290,7 @@ string User::login(unordered_map<string, User>& users, Admin admin)
 			break;
 		}
 	}
-	
+
 	cout << "\nLogged in successfully\n\n";
 	return userName;
 }
@@ -307,8 +325,8 @@ void User::makeTransaction(unordered_map<string, User>& users, stack<Transaction
 	}
 
 	
-	string passCheck = inputPassword();
-
+	cout << "Enter password: ";
+	string passCheck = User::inputPassword();
 	passCheck = passwordHashing(passCheck);
 
 	if (password != passCheck)
@@ -463,7 +481,7 @@ void User::editPassword()
 
 	cout << "Enter your old password: \n";
 
-	oldPassword = inputPassword();
+	oldPassword = User::inputPassword();
 	oldPassword = passwordHashing(oldPassword);
 	int i = 2;
 
@@ -471,7 +489,7 @@ void User::editPassword()
 
 		cout << "Old password is incorrect.\nEnter password again : " << endl;
 
-		oldPassword = inputPassword();
+		oldPassword = User::inputPassword();
 
 		oldPassword = passwordHashing(oldPassword);
 
@@ -494,7 +512,7 @@ void User::editPassword()
 	{
 		cout << "Now enter your password at least 8 letters and has at least 1 upper case letter and one number.\n";
 		cout << "Please enter you`re password: ";
-		newPassword = inputPassword();
+		newPassword = User::inputPassword();
 
 		if (newPassword.length() < 8 || newPassword.length() > 18)
 		{
@@ -650,57 +668,45 @@ string User::passwordHashing(string pass)
 	long long x = hashing(pass);
 	return to_string(x);
 }
-/*bool User::checkPassword(unordered_map<string, User>& users, string userName)
+bool User::checkPassword(string pass)
 {
-	char inputPassword[20];
-	char c;
-	int i = 0;
-	while (true)
+	bool has_upper = false;
+	bool has_number = false;
+
+	if (pass.length() < 8 || pass.length() > 18)
 	{
-		c = _getch();
-		if (c == '\r')
-		{
-			break;
-		}
-		if (c != '\b')
-		{
-			inputPassword[i] = c;
-			cout << '*';
-			i++;
-		}
-		else
-		{
-			i--;
-			if (i < 0)
-			{
-				i++;
-			}
-			else
-			{
-				cout << "\b \b";
-			}
-		}
-	}
-	inputPassword[i] = '\0';
-
-	string passw = inputPassword;
-	hash<string>hashing;
-
-	long long temp = hashing(passw);
-
-	string check = to_string(temp);
-
-	if (users[userName].getPassword() == check)
-	{
-		return true;
-	}
-
-	else
-	{
+		cout << "Error!\nPlease make sure you`er password length at least 8 and at most 18 letters.\n\n";
 		return false;
 	}
+	for (char PassC : pass)
+	{
+		if (isupper(PassC))
+		{
+			has_upper = true;
+			break;
+		}
+	}
+	for (char PassC : pass)
+	{
+		if (isdigit(PassC))
+		{
+			has_number = true;
+			break;
+		}
+	}
+	if (has_upper != true)
+	{
+		cout << "Error!\nPlease make sure that you have atleast one uppercase letter.\n\n";
+		return false;
+	}
+	if (has_number != true)
+	{
+		cout << "Error!\nPlease make sure that you have atleast one number\n\n";
+		return false;
+	}
+
+	return true;
 }
-*/
 
 string User::gen_random()
 {
@@ -718,6 +724,30 @@ string User::gen_random()
 string User::getGmail()
 {
 	return User::gmail;
+}
+
+int User::getIntger()
+{
+	string input;
+	int number = 0;
+	getline(cin, input);
+
+	if (input.length() > 7)
+		return -1;
+
+	bool notInt = false;
+	for (char c : input)
+	{
+		if (c >= '0' && c <= '9')
+		{
+			number = number * 10 + (c - '0');
+		}
+		else
+		{
+			return -1;
+		}
+	}
+	return number;
 }
 
 //dest.

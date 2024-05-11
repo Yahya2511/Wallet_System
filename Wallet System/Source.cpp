@@ -32,30 +32,11 @@ int main()
 	bool inAdmin = false;
 
 	unordered_map<string, User> users;
-	unordered_map<string, User>::iterator it;
-
-	users["user1"] = User("user1", "pass1", 1000);
-
 	Admin admin;
-
 	stack<Transaction> systemHistory;
-
-	time_t curr_time;
-	curr_time = time(NULL);
-	char tm[26]; // Buffer to hold the time string
-	ctime_s(tm, sizeof tm, &curr_time);
-	string date = tm;
-
-	cout << date << 1;
 
 	loadUsers(users, usersFileName);
 	loadSystemHistory(systemHistory, systemHistoryFileName);
-
-	cout << users.size() << endl;
-	for (it = users.begin(); it != users.end(); it++)
-	{
-		cout << it->second.getUserName() << endl;
-	}
 
 	while (runProgram)
 	{
@@ -387,6 +368,12 @@ void loadUsers(unordered_map<string, User>& users, string fileName)
 	{
 		//username
 		getline(data, userKey, '|');
+		if (userKey == "0")
+		{
+			cout << "System History is empty\n";
+			data.close();
+			return;
+		}
 		//Password
 		getline(data, userPass, '|');
 
@@ -472,6 +459,13 @@ void saveUsers(unordered_map<string, User>& users, string fileName)
 
 	unordered_map<string, User>::iterator it;
 
+	if (users.empty())
+	{
+		data << 0;
+		data.close();
+		return;
+	}
+
 	for (it = users.begin(); it != users.end(); it++)
 	{
 		data << it->second.getUserName() << '|' <<
@@ -486,12 +480,14 @@ void saveUsers(unordered_map<string, User>& users, string fileName)
 
 		long long historySize = it->second.getTransaction().size();
 		data << historySize << '\n';
-		for (int i = 0; i < historySize; i++)
+		while (!it->second.getTransaction().empty())
 		{
 			data << it->second.getTransaction().top().Get_Sender() << '|' <<
 				it->second.getTransaction().top().Get_Reciver() << "|" <<
 				it->second.getTransaction().top().Get_date() << "|" <<
 				it->second.getTransaction().top().Get_Amount() << "\n";
+
+			it->second.getTransaction().pop();
 		}
 
 
@@ -511,15 +507,19 @@ void saveUsers(unordered_map<string, User>& users, string fileName)
 		{
 			data << "\n";
 		}
-		for (int i = 0; i < queueSize; i++)
+		while (!it->second.getQueue().empty())
 		{
 			data << it->second.getQueue().front().Get_Sender() << '|' <<
 				it->second.getQueue().front().Get_Reciver() << "|" <<
 				it->second.getQueue().front().Get_date() << "|" <<
 				it->second.getQueue().front().Get_Amount();
 
+			string front = it->second.getQueue().front().Get_date();
+			string back = it->second.getQueue().back().Get_date();
+			it->second.getQueue().pop();
+
 			it++;
-			if (it != users.end() || (queueSize - 1) != i)
+			if (it != users.end() || (front != back))
 			{
 				data << "\n";
 			}
@@ -550,6 +550,12 @@ void loadSystemHistory(stack<Transaction>& systemHistory, string fileName)
 	while (!data.eof())
 	{
 		getline(data, sender, '|');
+		if (sender == "0")
+		{
+			cout << "System History is empty\n";
+			data.close();
+			return;
+		}
 		getline(data, reciver, '|');
 		getline(data, date, '|');
 		getline(data, strAmount);
@@ -582,15 +588,21 @@ void saveSystemHistory(stack<Transaction>& systemHistory, string fileName)
 		exit(1);
 	}
 
-	long long size = systemHistory.size();
-	for (long long  historyIndex = 0; historyIndex < size; historyIndex++)
+	if (systemHistory.empty())
+	{
+		data << 0;
+		data.close();
+		return;
+	}
+
+	while (!systemHistory.empty())
 	{
 		data << systemHistory.top().Get_Sender() << "|"
 			<< systemHistory.top().Get_Reciver() << "|"
 			<< systemHistory.top().Get_date() << "|"
 			<< systemHistory.top().Get_Amount();
-
-		if (historyIndex != size - 1)
+		systemHistory.pop();
+		if (!systemHistory.empty())
 		{
 			data << '\n';
 		}

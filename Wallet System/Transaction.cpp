@@ -2,7 +2,7 @@
 
 Transaction::Transaction()
 {
-
+	
 }
 
 Transaction::Transaction(string s,string r,double amt)
@@ -16,6 +16,7 @@ Transaction::Transaction(string s,string r,double amt)
 	char tm[26]; // Buffer to hold the time string
 	ctime_s(tm, sizeof tm, &curr_time);
 	date = tm;
+	date.pop_back();
 }
 
 Transaction::Transaction(string s, string r, string d, double amt)

@@ -1,10 +1,10 @@
 $smtpServer = "smtp.gmail.com"
 $smtpPort = 587
-$emailFrom = "newsmanegmentsystem@gmail.com"
+$emailFrom = "kingmomen510@gmail.com"
 $emailTo = "
-$subject = "News Account Password"
+$subject = "New Account Password"
 $body = "your random genrated code is 
-$password = ConvertTo-SecureString "vpru ibii enjc arjw " -AsPlainText -Force
+$password = ConvertTo-SecureString "ipwr tkmy xdbs jgbk " -AsPlainText -Force
 $credential = New-Object System.Management.Automation.PSCredential ($emailFrom, $password)
 $mailMessage = New-Object System.Net.Mail.MailMessage
 $mailMessage.Subject = $subject
