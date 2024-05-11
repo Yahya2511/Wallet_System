@@ -17,6 +17,29 @@ User::User(string name, string pass, double bal)
 	balance = bal;
 	status = Status::Active;
 }
+User::User(string name, string pass, double bal, string mail)
+{
+	userName = name;
+	password = pass;
+	gmail = mail;
+	balance = bal;
+	status = Status::Active;
+}
+
+//view Balance
+void User::viewBalance()
+{
+	cout << "Enter your password: ";
+	string pass = inputPassword();
+
+	pass = passwordHashing(pass);
+
+	if (pass == this->getPassword())
+		cout << "Your current balance is: " << this->getBalance() << "\n\n";
+
+	else
+		cout << "Wrong password!\n\n";
+}
 
 //Login and register
 void User::userRegister(unordered_map<string, User>& users)
@@ -78,21 +101,29 @@ void User::userRegister(unordered_map<string, User>& users)
 		//password checking after the loops
 		if (has_upper == true && has_number == true) 
 		{
-			cout << "DONE!\n\n";
+			cout << "\nYour Account is created. \n\n";
 			break;
 		}
 		if (has_upper != true) 
 		{
-			cout << "Please make sure that you have atleast one uppercase letter\n\n";
+			cout << "\nPlease make sure that you have atleast one uppercase letter.\n\n";
 			continue;
 		}
 		if (has_number != true) 
 		{
-			cout << "Please make sure that you have atleast one number\n\n";
+			cout << "\nPlease make sure that you have atleast one number\n\n";
 			continue;
 		}
 	}
-	passwordHashingForRegister(users, Username, Password);
+	Password = passwordHashing(Password);
+
+
+	string reggmail;
+	cout << "enter your gmail please " << endl;
+	cin >> reggmail;
+	cin.ignore();
+	users[Username] = User(Username, Password, 1000, reggmail);
+
 	users[Username] = User(Username, Password, 1000);
 
 }
@@ -100,6 +131,8 @@ string User::login(unordered_map<string, User>& users, Admin admin)
 {
 	string userName;
 	string pass;
+	int count = 0;
+
 	cout << "Enter user name: ";
 	getline(cin, userName);
 
@@ -109,23 +142,138 @@ string User::login(unordered_map<string, User>& users, Admin admin)
 		return "";
 	}
 
-	cout << "Enter password: ";
-	pass = inputPassword();
-
-	if (admin.login(userName, pass))
+	while (true)
 	{
-		return userName;
+		cout << "Enter password: ";
+		pass = inputPassword();
+
+		if (count >= 2)
+		{
+			int choice = 0;
+			cout << "\nif you want to exit enter 1 or enter 2 to change your password" << endl;
+			cin >> choice;
+			if (choice == 1)
+			{
+				return "";
+			}
+			else if (choice == 2)
+			{
+				string randomCode, enteredCode, password, confirmPassword;
+				string mail = users[userName].getGmail();
+				randomCode = User::gen_random();
+				fstream file;
+
+				file.open("C:\\Users\\Lenovo\\Documents\\ForgetPassword.ps1", ios::in | ios::out);
+
+				if (file.fail())
+				{
+					cout << "Error in opening file";
+					exit(1);
+				}
+
+				string line;
+				string content = "";
+				int lineNumber = 1;
+
+				while (getline(file, line))
+				{
+					if (lineNumber == 4)
+					{
+						line += mail + "\"";
+					}
+
+					if (lineNumber == 6)
+					{
+						line += randomCode + "\"";
+					}
+					content += line + "\n";
+
+					lineNumber++;
+				}
+
+				file.clear();
+				file.seekp(0, ios::beg);
+				file << content;
+				file.close();
+
+				system("powershell -ExecutionPolicy Bypass -File C:\\Users\\Lenovo\\Documents\\ForgetPassword.ps1");
+
+				string newContent = "";
+				string::size_type pos;
+				lineNumber = 1;
+
+				file.open("C:\\Users\\Lenovo\\Documents\\ForgetPassword.ps1", ios::in);
+
+				while (getline(file, line)) {
+					if (lineNumber == 4) {
+						pos = line.find(mail + "\"");
+						if (pos != string::npos) {
+							line.erase(pos, mail.size() + 1);
+						}
+					}
+					if (lineNumber == 6) {
+						pos = line.find(randomCode + "\"");
+						if (pos != string::npos) {
+							line.erase(pos, randomCode.size() + 1);
+						}
+					}
+					newContent += line + "\n";
+
+					lineNumber++;
+				}
+				file.close();
+				file.open("C:\\Users\\Lenovo\\Documents\\ForgetPassword.ps1", ios::out);
+				file << newContent;
+				file.close();
+				cout << "enter the 6-digit code or enter \"1\" to exit\n";
+				cin >> enteredCode;
+				while (true) {
+					if (enteredCode == randomCode) {
+						cout << "\nenter password\n";
+						cin >> password;
+						cout << "\nenter password again\n";
+						cin >> confirmPassword;
+						if (password == confirmPassword) {
+							users[userName].password = password;
+							cout << "\npassword changed\n\n";
+							break;
+						}
+						else {
+							cout << "\npasswords do not match\n";
+						}
+					}
+					else if (enteredCode == "1") {
+						break;
+					}
+					else {
+						cout << "code does'nt match\n\nplease enter the 6-digit code again\n";
+						cin >> enteredCode;
+					}
+				}
+				return "";
+			}
+			return "";
+		}
+		if (admin.login(userName, pass))
+		{
+			return userName;
+		}
+
+		pass = passwordHashing(pass);
+
+		if (users[userName].getPassword() != pass)
+		{
+			cout << "\nCan not login!\nReason: Wrong password.\n\n";
+			count++;
+		}
+
+		if (users[userName].getPassword() == pass)
+		{
+			break;
+		}
 	}
-
-	passwordHashingForRegister(users, userName, pass);
-
-	if (users[userName].getPassword() != pass)
-	{
-		cout << "Can not login!\nReason: Wrong password.\n\n";
-		return "";
-	}
-
-	cout << "Logged in successfully\n\n";
+	
+	cout << "\nLogged in successfully\n\n";
 	return userName;
 }
 
@@ -142,8 +290,7 @@ void User::makeTransaction(unordered_map<string, User>& users, stack<Transaction
 
 	string receiver;
 	cout << "Enter the name of the user you want to make transactoin to: ";
-	cin >> receiver;
-	cin.ignore();
+	getline(cin, receiver);
 
 	if (receiver == userName)
 	{
@@ -159,10 +306,10 @@ void User::makeTransaction(unordered_map<string, User>& users, stack<Transaction
 		return;
 	}
 
-	string passCheck;
-	cout << "Enter your Password: ";
-	cin >> passCheck;
-	cin.ignore();
+	
+	string passCheck = inputPassword();
+
+	passCheck = passwordHashing(passCheck);
 
 	if (password != passCheck)
 	{
@@ -241,14 +388,20 @@ void User::requestTransaction(unordered_map<string, User>& users)
 	}
 	string requestReceiver;
 	cout << "Enter the name of the user you want to request transaction from : ";
-	cin >> requestReceiver;
-	cin.ignore();
+	getline(cin, requestReceiver);
 
 	if (users.find(requestReceiver) == users.end())
 	{
 		cout << "Can not make transaction!\nReason: Sender not found\n\n";
 		return;
 	}
+
+	if (users[requestReceiver].getUserName() == this->userName)
+	{
+		cout << "Can not request money.\nReason: sender is the same as recever.\n";
+		return;
+	}
+
 	if (users[requestReceiver].getStatus() == Suspend)
 	{
 		cout << "Can not make transaction!\nReason: Sender is suspended\n\n";
@@ -393,12 +546,6 @@ void User::editPassword()
 	cout << "Password updated successfully!" << endl;
 
 }
-void User::displayUserInfo() 
-{
-	cout << "Username: " << User::userName << '\n' 
-		<< "Password: " << User::password << '\n'
-		<< "Balance: " << User::balance << "\n\n";
-}
 
 //getters and setters
 string User::getUserName()
@@ -493,10 +640,17 @@ string User::inputPassword(void)
 		}
 	}
 	inputPassword[i] = '\0';
+	cout << endl;
 	string pass = inputPassword;
 	return pass;
 }
-bool User::checkPassword(unordered_map<string, User>& users, string userName)
+string User::passwordHashing(string pass)
+{
+	hash<string>hashing;
+	long long x = hashing(pass);
+	return to_string(x);
+}
+/*bool User::checkPassword(unordered_map<string, User>& users, string userName)
 {
 	char inputPassword[20];
 	char c;
@@ -546,18 +700,24 @@ bool User::checkPassword(unordered_map<string, User>& users, string userName)
 		return false;
 	}
 }
+*/
 
-void User::passwordHashingForRegister(unordered_map<string, User>& users, string userName, string pass)
+string User::gen_random()
 {
-	hash<string>hashing;
-	long long x = hashing(pass);
-	users[userName].setPassword(to_string(x));
+	string alphanum = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	string random;
+	srand(time(0));
+
+	for (int i = 0; i < 6; ++i)
+	{
+		random += alphanum[rand() % (sizeof(alphanum) - 1)];
+	}
+
+	return random;
 }
-string User::passwordHashing(string pass)
+string User::getGmail()
 {
-	hash<string>hashing;
-	long long x = hashing(pass);
-	return to_string(x);
+	return User::gmail;
 }
 
 //dest.

@@ -76,16 +76,18 @@ void Admin::EditUsersPassword(unordered_map<string, User>& users, string userNam
 {
     string currentPassword, newPassword;
     unordered_map<string, User>::iterator it = users.find(userName);
+
     if (users.find(userName) != users.end()) 
     {
         cout << "Enter current password for user " << userName << ":\n";
-        cin >> currentPassword;
-        cin.ignore();
+        currentPassword = User::inputPassword();
+        currentPassword = User::passwordHashing(currentPassword);
+
         if (it->second.getPassword() == currentPassword)
         {
             cout << "Enter new password for user " << userName << ":\n";
-            cin >> newPassword;
-            cin.ignore();
+            newPassword = User::inputPassword();
+            newPassword = User::passwordHashing(newPassword);
 
             it->second.setPassword(newPassword);
             cout << "Password for user " << userName << " has been updated.\n";
@@ -176,7 +178,6 @@ void Admin::passwordHashing()
     long long x = hashing("Admin");
     password = to_string(x);
 }
-
 void Admin::passwordHashing(string& pass)
 {
     hash<string>hashing;

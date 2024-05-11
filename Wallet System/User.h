@@ -6,6 +6,9 @@
 #include <queue>
 #include <conio.h>
 #include <string>
+#include <ctime> 
+#include <cstdlib>
+#include <fstream>
 #include "Transaction.h"
 
 using namespace std;
@@ -21,6 +24,7 @@ class User
 	//variables
 	string userName;
 	string password;
+	string gmail;
 	double balance = 0;
 	Status status;
 
@@ -31,6 +35,9 @@ class User
 public:
 	User();
 	User(string, string, double);
+	User(string, string, double, string);
+
+	void viewBalance();
 
 	void static userRegister(unordered_map<string, User>&);
 	string static login(unordered_map<string, User>& users, class Admin admin);
@@ -49,7 +56,6 @@ public:
 
 	//edit password
 	void editPassword();
-	void displayUserInfo();
 
 	//getters and setters
 	string getUserName();
@@ -73,9 +79,12 @@ public:
 
 	//password hashing
 	string static inputPassword(void);
-	void static passwordHashingForRegister(unordered_map<string, User>& users, string userName, string pass);
-	string passwordHashing(string pass);
+	string static passwordHashing(string pass);
 	bool static checkPassword(unordered_map<string, User>& users, string userName);
+
+	//for forget password
+	static string gen_random();
+	string getGmail();
 
 	//dest.
 	~User();

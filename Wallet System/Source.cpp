@@ -32,6 +32,7 @@ int main()
 	bool inAdmin = false;
 
 	unordered_map<string, User> users;
+	unordered_map<string, User>::iterator it;
 
 	users["user1"] = User("user1", "pass1", 1000);
 
@@ -39,8 +40,22 @@ int main()
 
 	stack<Transaction> systemHistory;
 
+	time_t curr_time;
+	curr_time = time(NULL);
+	char tm[26]; // Buffer to hold the time string
+	ctime_s(tm, sizeof tm, &curr_time);
+	string date = tm;
+
+	cout << date << 1;
+
 	loadUsers(users, usersFileName);
 	loadSystemHistory(systemHistory, systemHistoryFileName);
+
+	cout << users.size() << endl;
+	for (it = users.begin(); it != users.end(); it++)
+	{
+		cout << it->second.getUserName() << endl;
+	}
 
 	while (runProgram)
 	{
@@ -120,20 +135,50 @@ int main()
 
 			choice = getInt();
 
+			switch (choice)
+			{
+			case 1: 
+				users[activeUser].viewBalance();
+				break;
+			case 2:
+				users[activeUser].makeTransaction(users, systemHistory);
+				break;
+			case 3:
+				users[activeUser].viewHistory();
+				break;
+			case 4:
+				users[activeUser].requestTransaction(users);
+				break;
+			case 5:
+				users[activeUser].viewRequest(users, systemHistory);
+				break;
+			case 6:
+				users[activeUser].editPassword();
+				break;
+			case 7:
+				activeUser = "";
+				inHome = false;
+				inWelcome = true;
+
+				cout << "Logged out successful.\n\n";
+				break;
+			case 8:
+				inHome = false;
+				runProgram = false;
+				break;
+			case -1:
+				cout << "invalid input!\nYou can not use words here!\n\n";
+				break;
+			default:
+				cout << "Invalide choice (" << choice << ")\n\n";
+				cout << "you can only choose form the above list";
+				break;
+			}
+			/*
 			//View Balance.
 			if (choice == 1)
 			{
-				cout << "Enter your password: ";
-				string pass;
-				cin >> pass;
-				cin.ignore();
-
-				if (pass == users[activeUser].getPassword())
-					cout << "Your current balance is: " << users[activeUser].getBalance() << "\n\n";
-
-				else
-					cout << "Wrong password!\n\n";
-
+				users[activeUser].viewBalance();
 			}
 
 			//Make Transaction.
@@ -143,7 +188,7 @@ int main()
 			}
 
 			//view history
-			if (choice == 3)
+			else if (choice == 3)
 			{
 				users[activeUser].viewHistory();
 			}
@@ -151,16 +196,6 @@ int main()
 			//Make a Request.
 			else if (choice == 4)
 			{
-				cout << "Enter user name that you want money form: ";
-				string receiver;
-				cin >> receiver;
-				cin.ignore();
-
-				cout << "Enter amount of money you want from him: ";
-				double amount;
-				cin >> amount;
-				cin.ignore();
-
 				users[activeUser].requestTransaction(users);
 			}
 
@@ -183,6 +218,8 @@ int main()
 				activeUser = "";
 				inHome = false;
 				inWelcome = true;
+
+				cout << "Logged out successful.\n\n";
 			}
 
 			//Exit.
@@ -203,6 +240,7 @@ int main()
 			{
 				cout << "Invalide choice!\n\n";
 			}
+			*/
 		}
 		while (inAdmin)
 		{
@@ -293,6 +331,8 @@ int main()
 				activeUser = "";
 				inAdmin = false;
 				inWelcome = true;
+
+				cout << "Logged out successful.\n\n";
 			}
 			
 			//Eixt
@@ -318,6 +358,8 @@ int main()
 
 	saveUsers(users, usersFileName);
 	saveSystemHistory(systemHistory, systemHistoryFileName);
+
+	cout << "Program Exited.\n";
 	return 0;
 }
 
@@ -418,6 +460,8 @@ void saveUsers(unordered_map<string, User>& users, string fileName)
 {
 	ofstream data;
 
+	bool fileEnd = false;
+
 	data.open(fileName);
 
 	if (data.fail())
@@ -450,8 +494,23 @@ void saveUsers(unordered_map<string, User>& users, string fileName)
 				it->second.getTransaction().top().Get_Amount() << "\n";
 		}
 
+
+
 		long long  queueSize = it->second.getQueue().size();
-		data << queueSize << '\n';
+		data << queueSize;
+		if (queueSize == 0)
+		{
+			it++;
+			if (it != users.end())
+			{
+				data << "\n";
+			}
+			it--;
+		}
+		else
+		{
+			data << "\n";
+		}
 		for (int i = 0; i < queueSize; i++)
 		{
 			data << it->second.getQueue().front().Get_Sender() << '|' <<
@@ -460,17 +519,15 @@ void saveUsers(unordered_map<string, User>& users, string fileName)
 				it->second.getQueue().front().Get_Amount();
 
 			it++;
-			if (it != users.end())
+			if (it != users.end() || (queueSize - 1) != i)
 			{
 				data << "\n";
-				cout << 1;
 			}
 			it--;
 		}
 	}
 
 	data.close();
-
 }
 
 void loadSystemHistory(stack<Transaction>& systemHistory, string fileName)
@@ -544,7 +601,7 @@ int getInt()
 {
 	string input;
 	int number = 0;
-	getline(cin, input, '\n');
+	getline(cin, input);
 
 	if (input.length() > 7)
 		return -1;

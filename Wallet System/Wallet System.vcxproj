@@ -141,6 +141,9 @@
     <Text Include="systemHistory.txt" />
     <Text Include="usersData.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="ForgetPassword.ps1" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

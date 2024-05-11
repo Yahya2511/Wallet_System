@@ -47,4 +47,9 @@
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="ForgetPassword.ps1">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>
