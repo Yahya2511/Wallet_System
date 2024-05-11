@@ -44,6 +44,7 @@ void User::viewBalance()
 //Login and register
 void User::userRegister(unordered_map<string, User>& users)
 {
+	string reggmail;//register gmail
 	string Username;
 	string Password;
 
@@ -101,7 +102,6 @@ void User::userRegister(unordered_map<string, User>& users)
 		//password checking after the loops
 		if (has_upper == true && has_number == true) 
 		{
-			cout << "\nYour Account is created. \n\n";
 			break;
 		}
 		if (has_upper != true) 
@@ -115,13 +115,25 @@ void User::userRegister(unordered_map<string, User>& users)
 			continue;
 		}
 	}
+
 	Password = passwordHashing(Password);
 
-
-	string reggmail;
-	cout << "enter your gmail please " << endl;
-	cin >> reggmail;
-	cin.ignore();
+	while (true)
+	{
+		cout << "Enter your gmail please " << endl;
+		cin >> reggmail;
+		cin.ignore();
+		if (reggmail.find("@gmail.com") == string::npos) //npos is number that return if value isnt found
+		{
+			cout << "Please enter a @gmail.com right " << endl;
+			continue;
+		}
+		else
+		{
+			break;
+		}
+	}
+	cout << "\nYour Account is created. \n\n";
 	users[Username] = User(Username, Password, 1000, reggmail);
 
 	//users[Username] = User(Username, Password, 1000);
