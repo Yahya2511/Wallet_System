@@ -44,7 +44,7 @@ void User::viewBalance()
 //Login and register
 void User::userRegister(unordered_map<string, User>& users)
 {
-	string reggmail;
+	string reggmail;//register 
 	string Username;
 	string Password;
 
@@ -89,7 +89,6 @@ void User::userRegister(unordered_map<string, User>& users)
 		}
 	}
 
-
 	bool doneCheck = false;
 	//password check
 	while (!doneCheck)
@@ -118,13 +117,13 @@ void User::userRegister(unordered_map<string, User>& users)
 			break;
 		}
 	}
-
 	cout << "\nYour Account is created. \n\n";
 	users[Username] = User(Username, Password, 1000, reggmail);
 
 	//users[Username] = User(Username, Password, 1000);
 
 }
+
 string User::login(unordered_map<string, User>& users, Admin admin)
 {
 	string userName;
@@ -231,6 +230,7 @@ string User::login(unordered_map<string, User>& users, Admin admin)
 				cout << "enter the 6-digit code or enter \"1\" to exit\n";
 				cin >> enteredCode;
 				cin.ignore();
+
 				while (true) 
 				{
 					if (enteredCode == randomCode)
@@ -244,14 +244,12 @@ string User::login(unordered_map<string, User>& users, Admin admin)
 						}
 
 						cout << "\nenter password again\n";
+
 						confirmPassword = User::inputPassword();
 
 						if (password == confirmPassword)
 						{
-							
 							users[userName].password = passwordHashing(password);
-							cout << "\npassword changed\n\n";
-							break;
 						}
 						else
 						{
