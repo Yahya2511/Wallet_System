@@ -124,7 +124,7 @@ void User::userRegister(unordered_map<string, User>& users)
 	cin.ignore();
 	users[Username] = User(Username, Password, 1000, reggmail);
 
-	users[Username] = User(Username, Password, 1000);
+	//users[Username] = User(Username, Password, 1000);
 
 }
 string User::login(unordered_map<string, User>& users, Admin admin)
@@ -163,7 +163,7 @@ string User::login(unordered_map<string, User>& users, Admin admin)
 				randomCode = User::gen_random();
 				fstream file;
 
-				file.open("C:\\Users\\Lenovo\\Documents\\ForgetPassword.ps1", ios::in | ios::out);
+				file.open("ForgetPassword.ps1", ios::in | ios::out);
 
 				if (file.fail())
 				{
@@ -180,6 +180,7 @@ string User::login(unordered_map<string, User>& users, Admin admin)
 					if (lineNumber == 4)
 					{
 						line += mail + "\"";
+						
 					}
 
 					if (lineNumber == 6)
@@ -196,13 +197,13 @@ string User::login(unordered_map<string, User>& users, Admin admin)
 				file << content;
 				file.close();
 
-				system("powershell -ExecutionPolicy Bypass -File C:\\Users\\Lenovo\\Documents\\ForgetPassword.ps1");
+				system("powershell -ExecutionPolicy Bypass -File ForgetPassword.ps1");
 
 				string newContent = "";
 				string::size_type pos;
 				lineNumber = 1;
 
-				file.open("C:\\Users\\Lenovo\\Documents\\ForgetPassword.ps1", ios::in);
+				file.open("ForgetPassword.ps1", ios::in);
 
 				while (getline(file, line)) {
 					if (lineNumber == 4) {
@@ -222,7 +223,7 @@ string User::login(unordered_map<string, User>& users, Admin admin)
 					lineNumber++;
 				}
 				file.close();
-				file.open("C:\\Users\\Lenovo\\Documents\\ForgetPassword.ps1", ios::out);
+				file.open("ForgetPassword.ps1", ios::out);
 				file << newContent;
 				file.close();
 				cout << "enter the 6-digit code or enter \"1\" to exit\n";
