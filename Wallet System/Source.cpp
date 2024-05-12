@@ -142,7 +142,7 @@ int main()
 				cout << "Logged out successful.\n\n";
 				break;
 			case 10:
-				inAdmin = false;
+				inHome = false;
 				runProgram = false;
 				break;
 			case -1:

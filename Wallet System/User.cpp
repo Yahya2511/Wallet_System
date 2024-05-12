@@ -587,7 +587,7 @@ void User::addToBalance(double amount)
 }
 void User::setBalance(double b)
 {
-	balance = b;
+	this->balance = b;
 }
 
 Status User::getStatus()
