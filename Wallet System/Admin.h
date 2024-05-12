@@ -25,7 +25,7 @@ public:
 
     void ViewUniTransaction(stack<class Transaction> sysHistory);
   
-    void adjustBalance(unordered_map<string, class User>);
+    void adjustBalance(unordered_map<string, class User>& users);
     void viewUsersInfo(unordered_map<string, class User>& users);
 
     void passwordHashing();

@@ -26,6 +26,8 @@ void Admin::AddUser(unordered_map<string, User>& users, double balance)
     while (true) 
     {
         string userName;
+        string initialPass;
+        string reggmail;
         cout << "Please enter user name\n\n";
         getline(cin, userName);
 
@@ -34,10 +36,32 @@ void Admin::AddUser(unordered_map<string, User>& users, double balance)
             cout << "Sorry, this user name already exists!\n\n";
             continue;
         }
-
         else 
         {
-            User user(userName, "1", balance);
+            while (true)
+            {
+                cout << "Enter your gmail please " << endl;
+                cin >> reggmail;
+                cin.ignore();
+                if (reggmail.find("@gmail.com") == string::npos) //npos is number that return if value isnt found
+                {
+                    cout << "Please enter a @gmail.com right " << endl;
+                    continue;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            do
+            {
+                cout << "Enter password: ";
+                initialPass = User::inputPassword();
+
+            } while (!User::checkPassword(initialPass));
+
+            User user(userName, User::passwordHashing(initialPass), balance, "Expamle");
             users[userName] = user;
             cout << "User " << userName << " added successfully!\n\n";
             break;
@@ -135,7 +159,7 @@ void Admin::ReactivateUser(unordered_map<string, User>& users, string userName)
         cout << "User " << userName << " not found." << endl;
 }
 
-void Admin::adjustBalance(unordered_map<string, User> users) 
+void Admin::adjustBalance(unordered_map<string, User>& users) 
 {
     string username;
     cout << "Enter username of the user: ";

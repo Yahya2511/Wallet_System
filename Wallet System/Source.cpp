@@ -152,7 +152,7 @@ int main()
 				break;
 			default:
 				cout << "Invalide choice (" << choice << ")\n\n";
-				cout << "you can only choose form the above list";
+				cout << "you can only choose form the above list\n";
 				break;
 			}
 			/*
@@ -429,7 +429,7 @@ void loadUsers(unordered_map<string, User>& users, string fileName)
 
 			amount = stod(strAmount);
 
-			users[userKey].addTransactionToQueue(Transaction(sender, reciver, date, amount));
+			users[userKey].addTransactionToVector(Transaction(sender, reciver, date, amount));
 		}
 
 		while (!temp.empty())
@@ -492,7 +492,7 @@ void saveUsers(unordered_map<string, User>& users, string fileName)
 
 
 
-		long long  queueSize = it->second.getQueue().size();
+		long long  queueSize = it->second.getVector().size();
 		data << queueSize;
 		if (queueSize == 0)
 		{
@@ -507,16 +507,16 @@ void saveUsers(unordered_map<string, User>& users, string fileName)
 		{
 			data << "\n";
 		}
-		while (!it->second.getQueue().empty())
+		while (!it->second.getVector().empty())
 		{
-			data << it->second.getQueue().front().Get_Sender() << '|' <<
-				it->second.getQueue().front().Get_Reciver() << "|" <<
-				it->second.getQueue().front().Get_date() << "|" <<
-				it->second.getQueue().front().Get_Amount();
+			data << it->second.getVector().front().Get_Sender() << '|' <<
+				it->second.getVector().front().Get_Reciver() << "|" <<
+				it->second.getVector().front().Get_date() << "|" <<
+				it->second.getVector().front().Get_Amount();
 
-			string front = it->second.getQueue().front().Get_date();
-			string back = it->second.getQueue().back().Get_date();
-			it->second.getQueue().pop();
+			string front = it->second.getVector().front().Get_date();
+			string back = it->second.getVector().back().Get_date();
+			it->second.getVector().pop_back();
 
 			it++;
 			if (it != users.end() || (front != back))

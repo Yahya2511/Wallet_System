@@ -3,7 +3,6 @@
 #include <vector>
 #include <stack>
 #include <unordered_map>
-#include <queue>
 #include <conio.h>
 #include <string>
 #include <ctime> 
@@ -29,7 +28,7 @@ class User
 	Status status;
 
 	stack <Transaction> historyOfTransaction;
-	queue <Transaction> transactionQueue;
+	vector <Transaction> transactionVector;
 
 	//methodes
 public:
@@ -73,9 +72,9 @@ public:
 
 	stack<Transaction>& getTransaction();
 	void addTransactionToStack(Transaction t);
-	void addTransactionToQueue(Transaction t);
+	void addTransactionToVector(Transaction t);
 
-	queue<Transaction>& getQueue();
+	vector<Transaction>& getVector();
 
 	//password hashing
 	string static inputPassword(void);

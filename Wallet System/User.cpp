@@ -117,6 +117,7 @@ void User::userRegister(unordered_map<string, User>& users)
 			break;
 		}
 	}
+
 	cout << "\nYour Account is created. \n\n";
 	users[Username] = User(Username, Password, 1000, reggmail);
 
@@ -132,6 +133,16 @@ string User::login(unordered_map<string, User>& users, Admin admin)
 
 	cout << "Enter user name: ";
 	getline(cin, userName);
+
+	if (userName == "Admin")
+	{
+		cout << "Enter password: ";
+		pass = User::inputPassword();
+		if (admin.login(userName, pass) == true)
+		{
+			return userName;
+		}
+	}
 
 	if (users.find(userName) == users.end())
 	{
@@ -250,6 +261,7 @@ string User::login(unordered_map<string, User>& users, Admin admin)
 						if (password == confirmPassword)
 						{
 							users[userName].password = passwordHashing(password);
+							break;
 						}
 						else
 						{
@@ -270,11 +282,7 @@ string User::login(unordered_map<string, User>& users, Admin admin)
 			}
 			return "";
 		}
-		if (admin.login(userName, pass))
-		{
-			return userName;
-		}
-
+		
 		pass = passwordHashing(pass);
 
 		if (users[userName].getPassword() != pass)
@@ -432,46 +440,69 @@ void User::requestTransaction(unordered_map<string, User>& users)
 void User::addRequest(unordered_map<string, User>& users, string requestReceiver, double amount)
 {
 	Transaction t(requestReceiver, userName, amount);
-	users[requestReceiver].transactionQueue.push(t);
+	users[requestReceiver].transactionVector.push_back(t);
 }
+
 void User::viewRequest(unordered_map<string, User>& users, stack<Transaction>& sysHistory)
 {
-	if (transactionQueue.empty())
+	if (transactionVector.empty())
 	{
 		cout << "You have no requests.\n\n";
 		return;
 	}
 
-	Transaction t = transactionQueue.front();
-	cout << "The user number " << t.Get_Reciver() << " Requests from you " << t.Get_Amount() << " dollars" << endl;
+	/*Transaction t = transactionVector.front();
+	cout << "The user number " << t.Get_Reciver() << " Requests from you " << t.Get_Amount() << " dollars" << endl;*/
+	int size = transactionVector.size();
+	cout << "Here are the requests" << endl;
+	for (int i = 0; i < size; i++)
+	{
+		cout << i + 1 << ": " << "The user number " << transactionVector[i].Get_Reciver() << " Requests from you " << transactionVector[i].Get_Amount() << " dollars" << endl;
+	}
 
-	string ans;
+	string choice;
+	int answer;
+	int count = 0;
+	vector<Transaction>::iterator it;
 	do
 	{
-		cout << "Enter yes to agree on the transaction no otherwise(yes / no)\n";
-		cin >> ans;
-		cin.ignore();
-
-	} while (ans != "yes" && ans != "no");
-	if (ans == "yes")
-	{
-		if (balance < t.Get_Amount())
+		cout << "Enter the number of transaction you want to make(Enter 0 or smaller number to exit)\n";
+		answer = getIntger();
+		if (answer <= 0)
 		{
-			cout << "Your balance is not enough please charge and try again\n";
 			return;
 		}
-		balance -= t.Get_Amount();
-		users[t.Get_Reciver()].addToBalance(t.Get_Amount());
-		addToHistory(users, sysHistory, t.Get_Reciver(), t.Get_Amount());
-		transactionQueue.pop();
-	}
-	else if (ans == "no")
-	{
-		transactionQueue.pop();
-	}
+		if (answer > size)
+		{
+			cout << "invalid number" << endl;
+			count++;
+			if (count > 2)
+			{
+				cout << "you reached the maximum number of attempts" << endl;
+				break;
+			}
+			continue;
+		}
+		for (int i = 0; i < size; i++)
+		{
+			if (i + 1 == answer)
+			{
+				balance -= transactionVector[i].Get_Amount();
+				users[transactionVector[i].Get_Reciver()].addToBalance(transactionVector[i].Get_Amount());
+				addToHistory(users, sysHistory, transactionVector[i].Get_Reciver(), transactionVector[i].Get_Amount());
+				it = transactionVector.begin() + i;
+				transactionVector.erase(it);
+			}
+		}
+		cout << "enter yes to make another transaction no otherwise" << endl;
+		do
+		{
+			cin >> choice;
+		} while (choice != "yes" && choice != "no");
+		count = 0;
 
+	} while (choice != "no");
 }
-
 //edit password
 void User::editPassword()
 {
@@ -613,14 +644,14 @@ void User::addTransactionToStack(Transaction t)
 {
 	historyOfTransaction.push(t);
 }
-void User::addTransactionToQueue(Transaction t)
+void User::addTransactionToVector(Transaction t)
 {
-	User::transactionQueue.push(t);
+	User::transactionVector.push_back(t);
 }
 
-queue<Transaction>& User::getQueue()
+vector<Transaction>& User::getVector()
 {
-	return transactionQueue;
+	return transactionVector;
 }
 
 // Password Hashing
