@@ -517,81 +517,26 @@ void User::editPassword()
 	while (oldPassword != password && i > 0) {
 
 		cout << "Old password is incorrect.\nEnter password again : " << endl;
-
 		oldPassword = User::inputPassword();
-
 		oldPassword = passwordHashing(oldPassword);
-
 		i--;
-
 	}
 
 	if (i == 0 && oldPassword != password)
-
 	{
-
 		cout << "You have been reached maxium attempets." << endl;
 
 		return;
 	}
-	bool has_upper = false;//to check if the passowrd has atleast one uppercase
-	bool has_number = false;//to check if the passowrd has atleast one number
+	cout << "Enter new password";
+	newPassword = inputPassword();
 
-	while (true)
+	if (checkPassword(newPassword))
 	{
-		cout << "Now enter your password at least 8 letters and has at least 1 upper case letter and one number.\n";
-		cout << "Please enter you`re password: ";
-		newPassword = User::inputPassword();
-
-		if (newPassword.length() < 8 || newPassword.length() > 18)
-		{
-			cout << "Please make sure you`er password length at least 8 and at most 18 letters.\n\n";
-			continue;
-		}
-		//has upper case?
-		for (char pass : newPassword)
-		{
-
-			if (isupper(pass))
-			{
-				has_upper = true;
-				break;
-			}
-
-		}
-		//has number?
-		for (char Pass : newPassword)
-		{
-
-			if (isdigit(Pass))
-			{
-				has_number = true;
-				break;
-			}
-		}
-
-		//password checking after the loops
-		if (has_upper == true && has_number == true)
-		{
-			cout << "DONE!\n\n";
-			break;
-		}
-		if (has_upper != true)
-		{
-			cout << "Please make sure that you have atleast one uppercase letter\n\n";
-			continue;
-		}
-		if (has_number != true)
-		{
-			cout << "Please make sure that you have atleast one number\n\n";
-			continue;
-		}
+		password = passwordHashing(newPassword);
+		cout << "Password updated successfully!" << endl;
+		return;
 	}
-
-	password = passwordHashing(newPassword);
-
-	cout << "Password updated successfully!" << endl;
-
 }
 
 //getters and setters
@@ -702,9 +647,9 @@ bool User::checkPassword(string pass)
 	bool has_upper = false;
 	bool has_number = false;
 
-	if (pass.length() < 8 || pass.length() > 18)
+	if (pass.length() < 8 || pass.length() > 14)
 	{
-		cout << "Error!\nPlease make sure you`er password length at least 8 and at most 18 letters.\n\n";
+		cout << "Error!\nPlease make sure you`er password length at least 8 and at most 14 letters.\n\n";
 		return false;
 	}
 	for (char PassC : pass)
