@@ -61,7 +61,7 @@ void Admin::AddUser(unordered_map<string, User>& users, double balance)
 
             } while (!User::checkPassword(initialPass));
 
-            User user(userName, User::passwordHashing(initialPass), balance, "Expamle");
+            User user(userName, User::passwordHashing(initialPass), balance, reggmail);
             users[userName] = user;
             cout << "User " << userName << " added successfully!\n\n";
             break;

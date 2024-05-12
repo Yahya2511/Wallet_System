@@ -318,7 +318,13 @@ void User::makeTransaction(unordered_map<string, User>& users, stack<Transaction
 
 	if (receiver == userName)
 	{
-		cout << "Can not send money to self!\n\n";
+		cout << "Can not make transaction!\nReason: Sender is the same as receiver\n\n";
+		return;
+	}
+
+	if (isBlocked(receiver))
+	{
+		cout << "Can not make transaction!\nReason: You blocked this your.\n\n";
 		return;
 	}
 
@@ -331,7 +337,7 @@ void User::makeTransaction(unordered_map<string, User>& users, stack<Transaction
 	}
 
 	
-	cout << "Enter password: ";
+	cout << "Enter your password: ";
 	string passCheck = User::inputPassword();
 	passCheck = passwordHashing(passCheck);
 
@@ -420,6 +426,12 @@ void User::requestTransaction(unordered_map<string, User>& users)
 		return;
 	}
 
+	if (users[requestReceiver].isBlocked(this->userName))
+	{
+		cout << "Can not make transaction!\nReason: You are blocked.\n\n";
+		return;
+	}
+
 	if (users[requestReceiver].getUserName() == this->userName)
 	{
 		cout << "Can not request money.\nReason: sender is the same as recever.\n";
@@ -466,7 +478,7 @@ void User::viewRequest(unordered_map<string, User>& users, stack<Transaction>& s
 	vector<Transaction>::iterator it;
 	do
 	{
-		cout << "Enter the number of transaction you want to make(Enter 0 or smaller number to exit)\n";
+		cout << "Enter the requset number to you want to take action(Enter 0 or smaller number to exit)\n";
 		answer = getIntger();
 		if (answer <= 0)
 		{
@@ -487,6 +499,12 @@ void User::viewRequest(unordered_map<string, User>& users, stack<Transaction>& s
 		{
 			if (i + 1 == answer)
 			{
+				if (transactionVector[i].Get_Amount() > balance)
+				{
+					cout << "Your balance is " << balance << " and you need to send " << transactionVector[i].Get_Amount()
+						<< ".\nAdd money then make the transaction.\n\n";
+					return;
+				}
 				balance -= transactionVector[i].Get_Amount();
 				users[transactionVector[i].Get_Reciver()].addToBalance(transactionVector[i].Get_Amount());
 				addToHistory(users, sysHistory, transactionVector[i].Get_Reciver(), transactionVector[i].Get_Amount());
@@ -498,6 +516,7 @@ void User::viewRequest(unordered_map<string, User>& users, stack<Transaction>& s
 		do
 		{
 			cin >> choice;
+			cin.ignore();
 		} while (choice != "yes" && choice != "no");
 		count = 0;
 
@@ -528,7 +547,7 @@ void User::editPassword()
 
 		return;
 	}
-	cout << "Enter new password";
+	cout << "Enter new password";	
 	newPassword = inputPassword();
 
 	if (checkPassword(newPassword))
@@ -649,7 +668,7 @@ bool User::checkPassword(string pass)
 
 	if (pass.length() < 8 || pass.length() > 14)
 	{
-		cout << "Error!\nPlease make sure you`er password length at least 8 and at most 14 letters.\n\n";
+		cout << "Error!\nPlease make sure your password length at least 8 and at most 14 letters.\n\n";
 		return false;
 	}
 	for (char PassC : pass)
@@ -700,6 +719,56 @@ string User::getGmail()
 	return User::gmail;
 }
 
+void User::blockUser(unordered_map<string, User>& users)
+{
+	string userName;
+
+	cout << "Enter username to block: ";
+	getline(cin, userName);
+	if (users.find(userName) == users.end())
+	{
+		cout << "User " << userName << " does not exist in the Wallet system.\n\n";
+		return;
+	}
+	set<string>::iterator it = blockedUsers.find(userName);
+	if (it == blockedUsers.end())
+	{
+		blockedUsers.insert(userName);
+		cout << "User " << userName << " has been blocked successfully.\n\n";
+	}
+	else
+	{
+		cout << "User " << userName << " is already blocked.\n\n";
+	}
+}
+void User::unBlockUser(unordered_map<string, User>& users)
+{
+	string userName;
+
+	cout << "Enter username to unblock: ";
+	getline(cin, userName);
+	if (users.find(userName) == users.end())
+	{
+		cout << "User " << userName << " does not exist in the Wallet system.\n\n";
+		return;
+	}
+
+	set<string>::iterator it = blockedUsers.find(userName);
+	if (it != blockedUsers.end())
+	{
+		blockedUsers.erase(it);
+		cout << "User " << userName << " has been unblocked successfully.\n\n";
+	}
+	else
+	{
+		cout << "User " << userName << " is not blocked.\n\n";
+	}
+}
+bool User::isBlocked(string& findBlockedUser)
+{
+	return (blockedUsers.find(findBlockedUser) != blockedUsers.end());
+}
+
 int User::getIntger()
 {
 	string input;
@@ -722,6 +791,11 @@ int User::getIntger()
 		}
 	}
 	return number;
+}
+
+set<string>& User::getBlockedSet()
+{
+	return blockedUsers;
 }
 
 //dest.

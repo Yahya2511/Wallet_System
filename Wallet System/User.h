@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <stack>
+#include <set>
 #include <unordered_map>
 #include <conio.h>
 #include <string>
@@ -29,6 +30,7 @@ class User
 
 	stack <Transaction> historyOfTransaction;
 	vector <Transaction> transactionVector;
+	set<string> blockedUsers;
 
 	//methodes
 public:
@@ -84,6 +86,12 @@ public:
 	//for forget password
 	static string gen_random();
 	string getGmail();
+
+	void blockUser(unordered_map<string, User>& users);
+	void unBlockUser(unordered_map<string, User>& users);
+	bool isBlocked(string& userName);
+
+	set<string>& getBlockedSet();
 
 	int static getIntger();
 

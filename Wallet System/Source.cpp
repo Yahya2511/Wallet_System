@@ -52,10 +52,12 @@ int main()
 
 			choice = getInt();
 
-			//Login.
-			if (choice == 1)
+			string checkUserName;
+
+			switch (choice)
 			{
-				string checkUserName = User::login(users, admin );
+			case 1:
+				checkUserName = User::login(users, admin);
 				if (checkUserName != "")
 				{
 					if (checkUserName == "Admin")
@@ -71,33 +73,21 @@ int main()
 						inHome = true;
 					}
 				}
-			}
-
-			//Register.
-			else if (choice == 2)
-			{
+				break;
+			case 2:
 				User::userRegister(users);
-			}
-
-			//Exit.
-			else if (choice == 3)
-			{
+				break;
+			case 3:
 				inWelcome = false;
 				runProgram = false;
-			}
-
-			//word as input
-			else if (choice == -1)
-			{
+				break;
+			case -1:
 				cout << "invalid input!\nYou can not use words here!\n\n";
-			}
-
-			//else.
-			else
-			{
+				break;
+			default:
 				cout << "Invalid Input\n\n";
+				break;
 			}
-
 		}
 		while (inHome)
 		{
@@ -110,8 +100,10 @@ int main()
 				"4. Make a Request.\n" <<
 				"5. View Request.\n" <<
 				"6. Edit Password.\n" <<
-				"7. Logout.\n" <<
-				"8. Exit.\n" <<
+				"7. Block User.\n" <<
+				"8. Unblock User.\n" <<
+				"9. Logout.\n" <<
+				"10. Exit.\n" <<
 				"Choice: ";
 
 			choice = getInt();
@@ -137,14 +129,20 @@ int main()
 				users[activeUser].editPassword();
 				break;
 			case 7:
+				users[activeUser].blockUser(users);
+				break;
+			case 8:
+				users[activeUser].unBlockUser(users);
+				break;
+			case 9:
 				activeUser = "";
 				inHome = false;
 				inWelcome = true;
 
 				cout << "Logged out successful.\n\n";
 				break;
-			case 8:
-				inHome = false;
+			case 10:
+				inAdmin = false;
 				runProgram = false;
 				break;
 			case -1:
@@ -175,97 +173,65 @@ int main()
 
 			choice = getInt();
 
-			//View Users
-			if (choice == 1)
+			string userName;
+
+			switch (choice)
 			{
+			case 1:
 				admin.viewUsersInfo(users);
-			}
-
-			//Add Users
-			else if (choice == 2)
-			{
+				break;
+			case 2:
 				admin.AddUser(users, 1000);
-			}
-
-			//Edit Users
-			else if (choice == 3)
-			{
-				string userName;
+				break;
+			case 3:
 				cout << "Enter User name to edit him/her: ";
 				getline(cin, userName);
 
 				admin.EditUsersPassword(users, userName);
-			}
 
-			//Delete Users
-			else if (choice == 4)
-			{
-				string userName;
+				break;
+			case 4:
 				cout << "Enter User name to Delete him/her: ";
 				getline(cin, userName);
 
 				admin.DeleteUser(users, userName);
-			}
-
-			//Suspend Users
-			else if (choice == 5)
-			{
-				string userName;
+				break;
+			case 5:
 				cout << "Enter User name to suspend him/her: ";
 				getline(cin, userName);
 
 				admin.SuspendUser(users, userName);
-			}
-
-			//Activate Users
-			else if (choice == 6)
-			{
-				string userName;
+				break;
+			case 6:
 				cout << "Enter User name to activate him/her: ";
 				getline(cin, userName);
 
 				admin.ReactivateUser(users, userName);
-			}
-
-			//view sys history
-			else if (choice == 7)
-			{
+				break;
+			case 7:
 				admin.ViewUniTransaction(systemHistory);
-			}
-
-			//Edit Users balance
-			else if (choice == 8)
-			{
+				break;
+			case 8:
 				admin.adjustBalance(users);
-			}
-
-			//logout
-			else if (choice == 9)
-			{
+				break;
+			case 9:
 				activeUser = "";
 				inAdmin = false;
 				inWelcome = true;
 
 				cout << "Logged out successful.\n\n";
-			}
-			
-			//Eixt
-			else if (choice == 10)
-			{
+				break;
+			case 10:
 				inAdmin = false;
 				runProgram = false;
-			}
-
-			//word as input
-			else if (choice == -1)
-			{
+				break;
+			case -1:
 				cout << "invalid input!\nYou can not use words here!\n\n";
-			}
-
-			//else.
-			else
-			{
-				cout << "Invalide choice!\n\n";
+				break;
+			default:
+				cout << "Invalide choice (" << choice << ")\n\n";
+				cout << "you can only choose form the above list\n";
+				break;
 			}
 		}
 	}
@@ -291,6 +257,7 @@ void loadUsers(unordered_map<string, User>& users, string fileName)
 
 	string userKey;
 	string userPass;
+	string gmail;
 	string userStatus;
 	string strBalance;
 	double userBalance = 0;
@@ -309,7 +276,8 @@ void loadUsers(unordered_map<string, User>& users, string fileName)
 		}
 		//Password
 		getline(data, userPass, '|');
-
+		//gmail
+		getline(data, gmail, '|');
 		//Status
 		getline(data, userStatus, '|');
 		
@@ -318,12 +286,24 @@ void loadUsers(unordered_map<string, User>& users, string fileName)
 		//Balance
 		userBalance = stod(strBalance);
 
-		users[userKey] = User(userKey, userPass, userBalance);
+		users[userKey] = User(userKey, userPass, userBalance, gmail);
 
 		if (userStatus == "Active")
 			users[userKey].setStatus(Status::Active);
 		else
 			users[userKey].setStatus(Status::Suspend);
+
+		int setSize;
+		data >> setSize;
+		data.ignore();
+
+		string blockedUserName;
+
+		for (int setIndex = 0; setIndex < setSize; setIndex++)
+		{
+			getline(data, blockedUserName);
+			users[userKey].getBlockedSet().insert(blockedUserName);
+		}
 
 
 		//user history
@@ -402,7 +382,8 @@ void saveUsers(unordered_map<string, User>& users, string fileName)
 	for (it = users.begin(); it != users.end(); it++)
 	{
 		data << it->second.getUserName() << '|' <<
-			it->second.getPassword() << '|';
+			it->second.getPassword() << '|' << 
+			it->second.getGmail() << '|';
 
 		if (it->second.getStatus() == Status::Active)
 			data << "Active|";
@@ -410,6 +391,14 @@ void saveUsers(unordered_map<string, User>& users, string fileName)
 			data << "Suspend|";
 
 		data << it->second.getBalance() << '\n';
+
+		//blocked users
+		data << it->second.getBlockedSet().size() << '\n';
+		while (!it->second.getBlockedSet().empty())
+		{
+			data << *it->second.getBlockedSet().begin() << '\n';
+			it->second.getBlockedSet().erase(it->second.getBlockedSet().begin());
+		}
 
 		long long historySize = it->second.getTransaction().size();
 		data << historySize << '\n';
